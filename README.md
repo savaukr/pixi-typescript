@@ -28,7 +28,7 @@ A beginner-friendly template for building interactive graphics and games using P
 
 Simply copy paste this and start coding
 
-`git clone --depth=1 --branch=master https://github.com/yordan-kanchelov/pixi-typescript-boilerplate`
+`git clone --depth=1 --branch=main https://github.com/savaukr/pixi-typescript.git`
 
 `rm -rf ./pixi-typescript-boilerplate/.git`
 
