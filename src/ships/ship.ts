@@ -3,6 +3,11 @@ export enum SHIPS_COLORS {
     RED = 0xc4033e,
 }
 
+export enum SHIPS_TYPE {
+    BRING = "bring",
+    TAKEOUT = "takeout",
+}
+
 export const SHIPS_WIDTH = 55;
 export const SHIPS_LENGTH = 130;
 
@@ -11,7 +16,7 @@ export interface IShip {
     full: boolean;
     frontLeft: number;
     frontRight: number;
-    backmLeft: number;
+    backLeft: number;
     backRight: number;
     fillingIn(): void;
     fillingOut(): void;
@@ -23,33 +28,26 @@ export class Ship implements IShip {
     full: boolean;
     frontLeft: number;
     frontRight: number;
-    backmLeft: number;
+    backLeft: number;
     backRight: number;
 
-    constructor(
-        id: number,
-        full: boolean,
-        frontLeft: number,
-        frontRight: number,
-        backmLeft: number,
-        backRight: number,
-    ) {
+    constructor(id: number, full: boolean, frontLeft: number, frontRight: number, backLeft: number, backRight: number) {
         this.id = id;
         this.full = full;
         this.frontLeft = frontLeft;
         this.frontRight = frontRight;
-        this.backmLeft = backmLeft;
+        this.backLeft = backLeft;
         this.backRight = backRight;
     }
 
-    fillingIn() {
+    public fillingIn() {
         console.log(`ship ${this.id} is full`);
     }
 
-    fillingOut() {
+    public fillingOut() {
         console.log(`ship ${this.id} is empty`);
     }
-    move() {
+    public move() {
         console.log(`ship ${this.id} is moving`);
     }
 }

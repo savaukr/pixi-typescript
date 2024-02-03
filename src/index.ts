@@ -1,8 +1,9 @@
-import "pixi-spine";
+// import "pixi-spine";
 import "./style.css";
 import { Terminal, ITerminal, TERMINAL_COLOR, TERMINAL_WIDTH, TERMINAL_LENGTH } from "./terminals/terminal";
 import { IShip, Ship, SHIPS_COLORS, SHIPS_WIDTH, SHIPS_LENGTH } from "./ships/ship";
-
+import { ShipTakeOut } from "./ships/shipTakeOut";
+import { ShipBring } from "./ships/shipBring";
 import { Application, Graphics } from "pixi.js";
 
 const app = new Application<HTMLCanvasElement>({
@@ -44,23 +45,44 @@ function initTerminals(portArea: Graphics): ITerminal[] {
 }
 
 //ships
-function initShip(portArea: Graphics, full: boolean, id: number, color: number, width: number, length: number): IShip {
+function initShip(portArea: Graphics, id: number, width: number, length: number): IShip {
     const frontRight = innerWidth - length;
     const frontLeft = frontRight + width;
     const backRight = innerWidth;
     const backLeft = backRight + width;
-    const ship = new Ship(1, full, frontLeft, frontRight, backLeft, backRight);
-    portArea.beginFill(color, 0);
-    portArea.lineStyle(10, color, 1);
-    portArea.drawRect(innerWidth - length, innerHeight / 2, length, width);
-    portArea.endFill();
-    return ship;
+    const rand = Math.random();
+    console.log(rand);
+    let ship: Ship;
+    if (rand < 0.5) {
+        ship = new ShipTakeOut(id, false, frontLeft, frontRight, backLeft, backRight);
+        portArea.beginFill(SHIPS_COLORS.GREEN, 0);
+        portArea.lineStyle(10, SHIPS_COLORS.GREEN, 1);
+        portArea.drawRect(innerWidth - length, innerHeight / 2, length, width);
+        portArea.endFill();
+        return ship;
+    } else {
+        ship = new ShipBring(id, true, frontLeft, frontRight, backLeft, backRight);
+        portArea.beginFill(SHIPS_COLORS.RED, 1);
+        portArea.lineStyle(10, SHIPS_COLORS.RED, 1);
+        portArea.drawRect(innerWidth - length, innerHeight / 2 - 3 * width, length, width);
+        portArea.endFill();
+        return ship;
+    }
 }
 function initShips(portArea: Graphics): IShip[] {
+    let id = 0;
     const ships: IShip[] = [];
-    const ship = initShip(portArea, false, 0, SHIPS_COLORS.GREEN, SHIPS_WIDTH, SHIPS_LENGTH);
+    let ship = initShip(portArea, id, SHIPS_WIDTH, SHIPS_LENGTH);
     ships.push(ship);
-    // ships.push(initShip(portArea, true, 0, SHIPS_COLORS.RED, SHIPS_WIDTH, SHIPS_LENGTH));
+    function createShip(): void {
+        if (ships.length < 20) {
+            ship = initShip(portArea, id, SHIPS_WIDTH, SHIPS_LENGTH);
+            ships.push(ship);
+            id++;
+        }
+        console.log(ships);
+    }
+    setInterval(createShip, 8000);
     return ships;
 }
 
