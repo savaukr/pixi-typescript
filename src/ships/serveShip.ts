@@ -34,15 +34,15 @@ export function initShips(app: Application): IShip[] {
     const ships: IShip[] = [];
     const ship = initShip(id, SHIPS_WIDTH, SHIPS_LENGTH);
     ships.push(ship);
-    ship.move();
+    ship.move(app);
     app.stage.addChild(ship.graph);
 
     function createShip(): void {
-        if (ships.length < 20) {
+        if (ships.length < 4) {
             const ship = initShip(id, SHIPS_WIDTH, SHIPS_LENGTH);
             ships.push(ship);
             app.stage.addChild(ship.graph);
-            ship.move();
+            ship.move(app);
             id++;
         }
         console.log(ships);
@@ -50,3 +50,12 @@ export function initShips(app: Application): IShip[] {
     setInterval(createShip, 8000);
     return ships;
 }
+
+// export function updateWrapper(graph: Graphics, app: Application) {
+//     function update(): void {
+//         graph.position.x += 1;
+//         app.render();
+//         requestAnimationFrame(update);
+//     }
+//     update();
+// }

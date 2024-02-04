@@ -2,7 +2,6 @@ import { Application, Graphics } from "pixi.js";
 import { terminals } from "./terminals/serveTerminal";
 import { initShips } from "./ships/serveShip";
 import "./style.css";
-// import { ITerminal } from "./terminals/terminal";
 
 const app = new Application<HTMLCanvasElement>({
     background: "#4d35FF",
