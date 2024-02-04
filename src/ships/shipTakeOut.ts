@@ -5,19 +5,18 @@ import { Ship, SHIPS_TYPE } from "./ship";
 
 export class ShipTakeOut extends Ship {
     type: string;
-    // private _timer: unknown | null;
+
     constructor(
         id: number,
         full: boolean,
-        frontLeft: number,
-        frontRight: number,
-        backLeft: number,
-        backRight: number,
+        // frontLeft: number,
+        // frontRight: number,
+        // backLeft: number,
+        // backRight: number,
         graph: Graphics,
     ) {
-        super(id, full, frontLeft, frontRight, backLeft, backRight, graph);
+        super(id, full, graph);
         this.type = SHIPS_TYPE.TAKEOUT;
-        // this._timer = null;
     }
     // private changeX(dx: number) {
     //     if (this.graph.x < -(innerWidth - TERMINAL_WIDTH)) return;

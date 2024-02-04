@@ -8,13 +8,13 @@ export class ShipBring extends Ship {
     constructor(
         id: number,
         full: boolean,
-        frontLeft: number,
-        frontRight: number,
-        backLeft: number,
-        backRight: number,
+        // frontLeft: number,
+        // frontRight: number,
+        // backLeft: number,
+        // backRight: number,
         graph: Graphics,
     ) {
-        super(id, full, frontLeft, frontRight, backLeft, backRight, graph);
+        super(id, full, graph);
         this.type = SHIPS_TYPE.BRING;
         // this._timer = null;
     }

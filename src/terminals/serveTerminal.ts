@@ -16,17 +16,18 @@ export function initTerminals(portArea: Graphics): ITerminal[] {
     );
     // terminals
     const terminals: ITerminal[] = [];
-    for (let i = 1; i <= COUNT_TERMINAL; i++) {
+    for (let i = 0; i < COUNT_TERMINAL; i++) {
         const topY = i * TERMINAL_LENGTH + i * 0.2 * TERMINAL_LENGTH;
         const topLeft = [0, topY];
         const topRight = [TERMINAL_WIDTH, topY];
         const bottomRight = [TERMINAL_WIDTH, topY + TERMINAL_LENGTH];
-        const terminal = new Terminal(i, false, topLeft, topRight, bottomRight);
+        const terminal = new Terminal(i + 1, false, topLeft, topRight, bottomRight);
         terminals.push(terminal);
         portArea.beginFill(TERMINAL_COLOR, 0);
         portArea.lineStyle(10, TERMINAL_COLOR, 1);
         portArea.drawRect(0, topRight[1], TERMINAL_WIDTH, TERMINAL_LENGTH);
         portArea.endFill();
     }
+
     return terminals;
 }

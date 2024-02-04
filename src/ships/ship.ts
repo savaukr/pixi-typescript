@@ -1,5 +1,5 @@
 import { Application, Graphics } from "pixi.js";
-import { TERMINAL_WIDTH, TTerminal } from "../terminals/terminal";
+import { TERMINAL_WIDTH, TTerminal, ITerminal } from "../terminals/terminal";
 import { PORT_WIDTH, SHIP_SPEED, SHIPS_LENGTH } from "../consts";
 
 export enum SHIPS_COLORS {
@@ -15,10 +15,10 @@ export enum SHIPS_TYPE {
 export interface IShip {
     id: number;
     full: boolean;
-    frontLeft: number;
-    frontRight: number;
-    backLeft: number;
-    backRight: number;
+    // frontLeft: number[];
+    // frontRight: number[];
+    // backLeft: number[];
+    // backRight: number[];
     graph: Graphics;
     fillingIn(): void;
     fillingOut(): void;
@@ -31,28 +31,28 @@ export interface IShip {
 export class Ship implements IShip {
     id: number;
     full: boolean;
-    frontLeft: number;
-    frontRight: number;
-    backLeft: number;
-    backRight: number;
+    // frontLeft: number[];
+    // frontRight: number[];
+    // backLeft: number[];
+    // backRight: number[];
     graph: Graphics;
     private _timer: number;
 
     constructor(
         id: number,
         full: boolean,
-        frontLeft: number,
-        frontRight: number,
-        backLeft: number,
-        backRight: number,
+        // frontLeft: number[],
+        // frontRight: number[],
+        // backLeft: number[],
+        // backRight: number[],
         graph: Graphics,
     ) {
         this.id = id;
         this.full = full;
-        this.frontLeft = frontLeft;
-        this.frontRight = frontRight;
-        this.backLeft = backLeft;
-        this.backRight = backRight;
+        // this.frontLeft = frontLeft;
+        // this.frontRight = frontRight;
+        // this.backLeft = backLeft;
+        // this.backRight = backRight;
         this.graph = graph;
         this._timer = 0;
     }
@@ -83,15 +83,18 @@ export class Ship implements IShip {
         this._timer = setInterval(() => {
             function update(): void {
                 savedThis.changeX(SHIP_SPEED);
-                if (savedThis.graph.x < PORT_WIDTH * innerWidth - innerWidth) {
+                if (savedThis.graph.x < PORT_WIDTH * innerWidth + SHIPS_LENGTH - innerWidth && savedThis.id !== 1) {
                     savedThis.stop();
                 }
+                if (savedThis.id == 1 && savedThis.graph.x < -innerWidth) {
+                    savedThis.stop();
+                    (terminals[2] as ITerminal).fillingIn();
+                }
+
                 app.render();
             }
             requestAnimationFrame(update);
         }, 100) as unknown as number;
-
-        console.log("terminals=", terminals);
     }
 
     stop() {
