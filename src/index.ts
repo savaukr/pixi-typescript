@@ -1,7 +1,8 @@
 import { Application, Graphics } from "pixi.js";
-import { initTerminals } from "./terminals/serveTerminal";
+import { terminals } from "./terminals/serveTerminal";
 import { initShips } from "./ships/serveShip";
 import "./style.css";
+// import { ITerminal } from "./terminals/terminal";
 
 const app = new Application<HTMLCanvasElement>({
     background: "#4d35FF",
@@ -9,12 +10,8 @@ const app = new Application<HTMLCanvasElement>({
 });
 document.body.appendChild(app.view);
 
-const portArea = new Graphics();
-
-//init elements
-const terminals = initTerminals(portArea);
 const ships = initShips(app);
-
+app.stage.addChild(terminals[0] as Graphics);
 console.log(terminals);
 console.log(ships);
 
@@ -25,7 +22,6 @@ console.log(ships);
 // portArea.endFill();
 
 // Add it to the stage to render
-app.stage.addChild(portArea);
 
 // console.log(
 //     `%cPixiJS V7\nTypescript Boilerplate%c ${VERSION} %chttp://www.pixijs.com %c❤️`,

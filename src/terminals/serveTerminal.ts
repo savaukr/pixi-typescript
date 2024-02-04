@@ -2,6 +2,8 @@ import { Graphics } from "pixi.js";
 import { BOARD_BOTTOM, BOARD_PASSAGE, BOARD_TOP, PORT_WIDTH } from "../consts";
 import { ITerminal, TERMINAL_COLOR, TERMINAL_LENGTH, TERMINAL_WIDTH, Terminal } from "./terminal";
 
+export type TTerminal = Graphics | ITerminal;
+
 export function initTerminals(portArea: Graphics): ITerminal[] {
     // board of port
 
@@ -28,3 +30,7 @@ export function initTerminals(portArea: Graphics): ITerminal[] {
     }
     return terminals;
 }
+
+//init elements
+const portArea = new Graphics();
+export const terminals: TTerminal[] = [portArea, ...initTerminals(portArea)];
