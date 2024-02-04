@@ -32,9 +32,10 @@ function initTerminals(portArea: Graphics): ITerminal[] {
     // terminals
     const terminals: ITerminal[] = [];
     for (let i = 0; i < 4; i++) {
+        const topLeft = 0;
         const topRight = i * TERMINAL_LENGTH + i * 0.2 * TERMINAL_LENGTH;
         const bottomRight = topRight + TERMINAL_LENGTH;
-        const terminal = new Terminal(i, false, topRight, bottomRight);
+        const terminal = new Terminal(i, false, topLeft, topRight, bottomRight);
         terminals.push(terminal);
         portArea.beginFill(TERMINAL_COLOR, 0);
         portArea.lineStyle(10, TERMINAL_COLOR, 1);
@@ -45,39 +46,45 @@ function initTerminals(portArea: Graphics): ITerminal[] {
 }
 
 //ships
-function initShip(portArea: Graphics, id: number, width: number, length: number): IShip {
+function initShip(id: number, width: number, length: number): IShip {
+    const graph = new Graphics();
     const frontRight = innerWidth - length;
     const frontLeft = frontRight + width;
     const backRight = innerWidth;
     const backLeft = backRight + width;
     const rand = Math.random();
-    console.log(rand);
     let ship: Ship;
     if (rand < 0.5) {
-        ship = new ShipTakeOut(id, false, frontLeft, frontRight, backLeft, backRight);
-        portArea.beginFill(SHIPS_COLORS.GREEN, 0);
-        portArea.lineStyle(10, SHIPS_COLORS.GREEN, 1);
-        portArea.drawRect(innerWidth - length, innerHeight / 2, length, width);
-        portArea.endFill();
+        ship = new ShipTakeOut(id, false, frontLeft, frontRight, backLeft, backRight, graph);
+        graph.beginFill(SHIPS_COLORS.GREEN, 0);
+        graph.lineStyle(10, SHIPS_COLORS.GREEN, 1);
+        graph.drawRect(innerWidth - length, innerHeight / 2 + 0.5 * width, length, width);
+        graph.endFill();
         return ship;
     } else {
-        ship = new ShipBring(id, true, frontLeft, frontRight, backLeft, backRight);
-        portArea.beginFill(SHIPS_COLORS.RED, 1);
-        portArea.lineStyle(10, SHIPS_COLORS.RED, 1);
-        portArea.drawRect(innerWidth - length, innerHeight / 2 - 3 * width, length, width);
-        portArea.endFill();
+        ship = new ShipBring(id, true, frontLeft, frontRight, backLeft, backRight, graph);
+        graph.beginFill(SHIPS_COLORS.RED, 1);
+        graph.lineStyle(10, SHIPS_COLORS.RED, 1);
+        graph.drawRect(innerWidth - length, innerHeight / 2 - 3.3 * width, length, width);
+        graph.endFill();
         return ship;
     }
 }
-function initShips(portArea: Graphics): IShip[] {
+
+function initShips(): IShip[] {
     let id = 0;
     const ships: IShip[] = [];
-    let ship = initShip(portArea, id, SHIPS_WIDTH, SHIPS_LENGTH);
+    const ship = initShip(id, SHIPS_WIDTH, SHIPS_LENGTH);
     ships.push(ship);
+    ship.move();
+    app.stage.addChild(ship.graph);
+
     function createShip(): void {
         if (ships.length < 20) {
-            ship = initShip(portArea, id, SHIPS_WIDTH, SHIPS_LENGTH);
+            const ship = initShip(id, SHIPS_WIDTH, SHIPS_LENGTH);
             ships.push(ship);
+            app.stage.addChild(ship.graph);
+            ship.move();
             id++;
         }
         console.log(ships);
@@ -86,8 +93,18 @@ function initShips(portArea: Graphics): IShip[] {
     return ships;
 }
 
-console.log(initTerminals(portArea));
-console.log(initShips(portArea));
+const ships = initShips();
+const terminals = initTerminals(portArea);
+
+// ships[0].y += 5;
+console.log(terminals);
+console.log(ships);
+
+//Filling terminal
+// portArea.beginFill(TERMINAL_COLOR, 1);
+// portArea.lineStyle(10, TERMINAL_COLOR, 1);
+// portArea.drawRect(terminals[0].topRight, terminals[0].topRight, TERMINAL_WIDTH, TERMINAL_LENGTH);
+// portArea.endFill();
 
 // Add it to the stage to render
 app.stage.addChild(portArea);

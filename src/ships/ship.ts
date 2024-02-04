@@ -1,3 +1,5 @@
+import { Graphics } from "pixi.js";
+
 export enum SHIPS_COLORS {
     GREEN = 0x046a26,
     RED = 0xc4033e,
@@ -18,6 +20,7 @@ export interface IShip {
     frontRight: number;
     backLeft: number;
     backRight: number;
+    graph: Graphics;
     fillingIn(): void;
     fillingOut(): void;
     move(): void;
@@ -30,14 +33,24 @@ export class Ship implements IShip {
     frontRight: number;
     backLeft: number;
     backRight: number;
+    graph: Graphics;
 
-    constructor(id: number, full: boolean, frontLeft: number, frontRight: number, backLeft: number, backRight: number) {
+    constructor(
+        id: number,
+        full: boolean,
+        frontLeft: number,
+        frontRight: number,
+        backLeft: number,
+        backRight: number,
+        graph: Graphics,
+    ) {
         this.id = id;
         this.full = full;
         this.frontLeft = frontLeft;
         this.frontRight = frontRight;
         this.backLeft = backLeft;
         this.backRight = backRight;
+        this.graph = graph;
     }
 
     public fillingIn() {
@@ -47,7 +60,5 @@ export class Ship implements IShip {
     public fillingOut() {
         console.log(`ship ${this.id} is empty`);
     }
-    public move() {
-        console.log(`ship ${this.id} is moving`);
-    }
+    public move() {}
 }

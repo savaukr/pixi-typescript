@@ -5,6 +5,7 @@ export const TERMINAL_LENGTH = 150;
 export interface ITerminal {
     id: number;
     full: boolean;
+    topLeft: number;
     topRight: number;
     bottomRight: number;
     fillingIn(): void;
@@ -14,12 +15,14 @@ export interface ITerminal {
 export class Terminal implements ITerminal {
     id: number;
     full: boolean;
+    topLeft: number;
     topRight: number;
     bottomRight: number;
 
-    constructor(id: number, full: boolean, topRight: number, bottomRight: number) {
+    constructor(id: number, full: boolean, topLeft: number, topRight: number, bottomRight: number) {
         this.id = id;
         this.full = full;
+        this.topLeft = topLeft;
         this.topRight = topRight;
         this.bottomRight = bottomRight;
     }
