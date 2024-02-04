@@ -1,5 +1,6 @@
 import { Application, Graphics } from "pixi.js";
-import { terminals } from "./terminals/serveTerminal";
+import { initTerminals } from "./terminals/serveTerminal";
+import { TTerminal } from "./terminals/terminal";
 import { initShips } from "./ships/serveShip";
 import "./style.css";
 
@@ -9,7 +10,11 @@ const app = new Application<HTMLCanvasElement>({
 });
 document.body.appendChild(app.view);
 
-const ships = initShips(app);
+//init elements
+const portArea = new Graphics();
+export const terminals: TTerminal[] = [portArea, ...initTerminals(portArea)];
+
+const ships = initShips(app, terminals);
 app.stage.addChild(terminals[0] as Graphics);
 console.log(terminals);
 console.log(ships);

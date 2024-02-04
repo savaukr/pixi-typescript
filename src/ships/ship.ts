@@ -1,5 +1,5 @@
 import { Application, Graphics } from "pixi.js";
-import { TERMINAL_WIDTH } from "../terminals/terminal";
+import { TERMINAL_WIDTH, TTerminal } from "../terminals/terminal";
 import { PORT_WIDTH, SHIP_SPEED, SHIPS_LENGTH } from "../consts";
 
 export enum SHIPS_COLORS {
@@ -22,7 +22,7 @@ export interface IShip {
     graph: Graphics;
     fillingIn(): void;
     fillingOut(): void;
-    move(app: Application): void;
+    move(app: Application, terminals: TTerminal[]): void;
     stop(): void;
     // moveBack(): void;
     rotate(rad: number): void;
@@ -77,16 +77,7 @@ export class Ship implements IShip {
         this.graph.y += dy;
     }
 
-    protected updateWrapper(graph: Graphics, app: Application): void {
-        function update(): void {
-            graph.position.x += 1;
-            app.render();
-            requestAnimationFrame(update);
-        }
-        update();
-    }
-
-    move(app: Application) {
+    move(app: Application, terminals: TTerminal[]) {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const savedThis = this;
         this._timer = setInterval(() => {
@@ -99,10 +90,11 @@ export class Ship implements IShip {
             }
             requestAnimationFrame(update);
         }, 100) as unknown as number;
+
+        console.log("terminals=", terminals);
     }
 
     stop() {
         clearInterval(this._timer);
     }
-    // moveBack() {}
 }
