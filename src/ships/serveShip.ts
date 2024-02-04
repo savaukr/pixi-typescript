@@ -3,7 +3,7 @@ import { ShipTakeOut } from "./shipTakeOut";
 import { IShip, SHIPS_COLORS, Ship } from "./ship";
 import { Application, Graphics } from "pixi.js";
 import { SHIPS_LENGTH, SHIPS_WIDTH } from "../consts";
-import { TTerminal } from "../terminals/terminal";
+import { ITerminal } from "../terminals/terminal";
 
 export function initShip(id: number, width: number, length: number): IShip {
     const graph = new Graphics();
@@ -30,7 +30,7 @@ export function initShip(id: number, width: number, length: number): IShip {
     }
 }
 
-export function initShips(app: Application, terminals: TTerminal[]): IShip[] {
+export function initShips(app: Application, terminals: ITerminal[]): IShip[] {
     let id = 0;
     const ships: IShip[] = [];
     const ship = initShip(id, SHIPS_WIDTH, SHIPS_LENGTH);

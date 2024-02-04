@@ -1,5 +1,5 @@
 import { Application, Graphics } from "pixi.js";
-import { TERMINAL_WIDTH, TTerminal, ITerminal } from "../terminals/terminal";
+import { TERMINAL_WIDTH, ITerminal } from "../terminals/terminal";
 import { PORT_WIDTH, SHIP_SPEED, SHIPS_LENGTH } from "../consts";
 
 export enum SHIPS_COLORS {
@@ -22,7 +22,7 @@ export interface IShip {
     graph: Graphics;
     fillingIn(): void;
     fillingOut(): void;
-    move(app: Application, terminals: TTerminal[]): void;
+    move(app: Application, terminals: ITerminal[]): void;
     stop(): void;
     // moveBack(): void;
     rotate(rad: number): void;
@@ -58,10 +58,12 @@ export class Ship implements IShip {
     }
 
     fillingIn() {
+        this.full = true;
         console.log(`ship ${this.id} is full`);
     }
 
     fillingOut() {
+        this.full = false;
         console.log(`ship ${this.id} is empty`);
     }
 
@@ -77,18 +79,23 @@ export class Ship implements IShip {
         this.graph.y += dy;
     }
 
-    move(app: Application, terminals: TTerminal[]) {
+    move(app: Application, terminals: ITerminal[]) {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const savedThis = this;
+
         this._timer = setInterval(() => {
+            savedThis.changeX(SHIP_SPEED);
+
             function update(): void {
                 savedThis.changeX(SHIP_SPEED);
                 if (savedThis.graph.x < PORT_WIDTH * innerWidth + SHIPS_LENGTH - innerWidth && savedThis.id !== 1) {
                     savedThis.stop();
                 }
-                if (savedThis.id == 1 && savedThis.graph.x < -innerWidth) {
+                if (savedThis.id == 1 && savedThis.graph.x < -1050) {
+                    terminals[0].fillingIn();
+                    savedThis.fillingOut();
+                    console.log(terminals);
                     savedThis.stop();
-                    (terminals[2] as ITerminal).fillingIn();
                 }
 
                 app.render();

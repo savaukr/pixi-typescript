@@ -1,5 +1,3 @@
-import { Graphics } from "pixi.js";
-
 export const TERMINAL_COLOR = 0xffbd01;
 export const TERMINAL_WIDTH = 50;
 export const TERMINAL_LENGTH = 150;
@@ -13,7 +11,6 @@ export interface ITerminal {
     fillingIn(): void;
     fillingOut(): void;
 }
-export type TTerminal = Graphics | ITerminal;
 
 export class Terminal implements ITerminal {
     id: number;
@@ -31,10 +28,12 @@ export class Terminal implements ITerminal {
     }
 
     fillingIn() {
+        this.full = true;
         console.log(`terminal ${this.id} is full`);
     }
 
     fillingOut() {
+        this.full = false;
         console.log(`terminal ${this.id} is empty`);
     }
 }

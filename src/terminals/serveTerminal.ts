@@ -31,3 +31,12 @@ export function initTerminals(portArea: Graphics): ITerminal[] {
 
     return terminals;
 }
+
+export function updViewTerminal(portArea: Graphics, i: number, terminals: ITerminal[]): void {
+    const topY = i * TERMINAL_LENGTH + i * 0.2 * TERMINAL_LENGTH;
+    const topRight = [TERMINAL_WIDTH, topY];
+    portArea.beginFill(TERMINAL_COLOR, terminals[i].full ? 1 : 0);
+    portArea.lineStyle(10, TERMINAL_COLOR, 1);
+    portArea.drawRect(0, topRight[1], TERMINAL_WIDTH, TERMINAL_LENGTH);
+    portArea.endFill();
+}
