@@ -1,4 +1,4 @@
-import { Application, Graphics } from "pixi.js";
+import { Application } from "pixi.js";
 import { initTerminals } from "./terminals/serveTerminal";
 
 import { initShips } from "./ships/serveShip";
@@ -12,13 +12,28 @@ const app = new Application<HTMLCanvasElement>({
 document.body.appendChild(app.view);
 
 //init elements
-const portArea = new Graphics();
-export const terminals: ITerminal[] = initTerminals(portArea);
 
+const terminals: ITerminal[] = initTerminals(app);
 const ships = initShips(app, terminals);
-app.stage.addChild(portArea);
-console.log(terminals);
-console.log(ships);
+
+app.ticker.add(() => {
+    // console.log("ticker");
+    // if (ships[3]) {
+    //     if (ships[3].graph.x < 300) ships[3].graph.x += 2;
+    //     // console.log("add tickker 3", ships[3].graph.x);
+    // }
+    // if (terminals[2]) {
+    //     terminals[2].graph.x += 2;
+    //     console.log("add tickker 2", terminals[2].graph.x);
+    // }
+    // if (terminals[3]) {
+    //     terminals[3].graph.beginFill(0x046a26, 1);
+    //     terminals[3].graph.endFill();
+    // }
+});
+
+console.log("terminals:", terminals);
+console.log("ships:", ships);
 
 //Filling terminal
 // portArea.beginFill(TERMINAL_COLOR, 1);

@@ -5,7 +5,7 @@ import { Application, Graphics } from "pixi.js";
 import { SHIPS_LENGTH, SHIPS_WIDTH } from "../consts";
 import { ITerminal } from "../terminals/terminal";
 
-export function initShip(id: number, width: number, length: number): IShip {
+export function initShip(app: Application, id: number, width: number, length: number): IShip {
     const graph = new Graphics();
     // const frontRight = innerWidth - length;
     // const frontLeft = frontRight + width;
@@ -19,6 +19,8 @@ export function initShip(id: number, width: number, length: number): IShip {
         graph.lineStyle(10, SHIPS_COLORS.GREEN, 1);
         graph.drawRect(innerWidth - length, innerHeight / 2 + 0.5 * width, length, width);
         graph.endFill();
+        app.stage.addChild(ship.graph);
+
         return ship;
     } else {
         ship = new ShipBring(id, true, graph);
@@ -26,6 +28,8 @@ export function initShip(id: number, width: number, length: number): IShip {
         graph.lineStyle(10, SHIPS_COLORS.RED, 1);
         graph.drawRect(innerWidth - length, innerHeight / 2 - 3.3 * width, length, width);
         graph.endFill();
+        app.stage.addChild(ship.graph);
+
         return ship;
     }
 }
@@ -33,15 +37,14 @@ export function initShip(id: number, width: number, length: number): IShip {
 export function initShips(app: Application, terminals: ITerminal[]): IShip[] {
     let id = 0;
     const ships: IShip[] = [];
-    const ship = initShip(id, SHIPS_WIDTH, SHIPS_LENGTH);
+    const ship = initShip(app, id, SHIPS_WIDTH, SHIPS_LENGTH);
     id++;
     ships.push(ship);
     ship.move(app, terminals);
-    app.stage.addChild(ship.graph);
 
     function createShip(): void {
         if (ships.length < 4) {
-            const ship = initShip(id, SHIPS_WIDTH, SHIPS_LENGTH);
+            const ship = initShip(app, id, SHIPS_WIDTH, SHIPS_LENGTH);
             ships.push(ship);
             app.stage.addChild(ship.graph);
             ship.move(app, terminals);

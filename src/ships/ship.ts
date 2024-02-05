@@ -94,7 +94,6 @@ export class Ship implements IShip {
                 if (savedThis.id == 0 && savedThis.graph.x < -1050) {
                     terminals[0].fillingIn();
                     savedThis.fillingOut();
-                    console.log(terminals);
                     savedThis.stop();
                 }
 
