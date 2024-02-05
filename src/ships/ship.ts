@@ -88,10 +88,10 @@ export class Ship implements IShip {
 
             function update(): void {
                 savedThis.changeX(SHIP_SPEED);
-                if (savedThis.graph.x < PORT_WIDTH * innerWidth + SHIPS_LENGTH - innerWidth && savedThis.id !== 1) {
+                if (savedThis.graph.x < PORT_WIDTH * innerWidth + SHIPS_LENGTH - innerWidth && savedThis.id !== 0) {
                     savedThis.stop();
                 }
-                if (savedThis.id == 1 && savedThis.graph.x < -1050) {
+                if (savedThis.id == 0 && savedThis.graph.x < -1050) {
                     terminals[0].fillingIn();
                     savedThis.fillingOut();
                     console.log(terminals);
