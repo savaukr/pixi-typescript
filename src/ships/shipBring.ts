@@ -1,36 +1,35 @@
-import { Graphics } from "pixi.js";
-import { SHIPS_TYPE, Ship } from "./ship";
-// import { TERMINAL_WIDTH } from "../terminals/terminal";
+import { appHeight, appWidth } from "..";
+import { SHIPS_LENGTH, SHIPS_WIDTH } from "../consts";
+import { IShip, SHIPS_COLORS, SHIPS_TYPE, Ship } from "./ship";
 
 export class ShipBring extends Ship {
     type: string;
-    // private _timer: unknown | null;
-    constructor(
-        id: number,
-        full: boolean,
-        // frontLeft: number,
-        // frontRight: number,
-        // backLeft: number,
-        // backRight: number,
-        graph: Graphics,
-    ) {
-        super(id, full, graph);
+    constructor(id: number, ships: IShip[]) {
+        super(id, ships, true);
         this.type = SHIPS_TYPE.BRING;
-        // this._timer = null;
+        this.graph.beginFill(SHIPS_COLORS.RED, 1);
+        this.graph.lineStyle(10, SHIPS_COLORS.RED, 1);
+        this.graph.drawRect(0, 0, SHIPS_LENGTH, SHIPS_WIDTH);
+        this.graph.x = appWidth - SHIPS_LENGTH / 10;
+        this.graph.y = appHeight / 2 - 3.2 * SHIPS_WIDTH;
+        this.graph.endFill();
     }
-    // private changeX(dx: number) {
-    //     if (this.graph.x < -(innerWidth - TERMINAL_WIDTH)) return;
-    //     this.graph.x -= dx;
-    // }
-    // private changeY(dy: number) {
-    //     if (this.graph.y < -innerHeight / 2 || this.graph.y > innerHeight / 2) return;
-    //     this.graph.y += dy;
-    // }
-    // move() {
-    //     this._timer = setInterval(() => {
-    //         this.changeX(SHIP_SPEED));
-    //         // this.changeY(-1);
-    //     }, 100);
-    //     console.log(`ship BRING ${this.id} is moving`);
-    // }
+    fillingIn() {
+        this.full = true;
+        this.graph.clear();
+        this.graph.beginFill(SHIPS_COLORS.RED, 1);
+        this.graph.lineStyle(10, SHIPS_COLORS.RED, 1);
+        this.graph.drawRect(this.graph.position.x, this.graph.position.y, SHIPS_WIDTH, SHIPS_LENGTH);
+        this.graph.endFill();
+        console.log(`ship ${this.id} is full`);
+    }
+    fillingOut() {
+        this.full = true;
+        this.graph.clear();
+        this.graph.beginFill(SHIPS_COLORS.RED, 1);
+        this.graph.lineStyle(10, SHIPS_COLORS.RED, 1);
+        this.graph.drawRect(this.graph.position.x, this.graph.position.y, SHIPS_WIDTH, SHIPS_LENGTH);
+        this.graph.endFill();
+        console.log(`ship ${this.id} is empty`);
+    }
 }

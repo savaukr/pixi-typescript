@@ -2,18 +2,14 @@ import { COUNT_TERMINAL } from "./../consts";
 import { Application, Graphics } from "pixi.js";
 import { BOARD_BOTTOM, BOARD_PASSAGE, BOARD_TOP, PORT_WIDTH } from "../consts";
 import { ITerminal, TERMINAL_COLOR, TERMINAL_LENGTH, TERMINAL_WIDTH, Terminal } from "./terminal";
+import { appHeight, appWidth } from "..";
 
 export function initTerminals(app: Application): ITerminal[] {
     // board of port
     const portArea = new Graphics();
     portArea.lineStyle(10, TERMINAL_COLOR, 1);
-    portArea.drawRect(innerWidth * PORT_WIDTH, 0, 0, innerHeight * BOARD_TOP);
-    portArea.drawRect(
-        innerWidth * PORT_WIDTH,
-        innerHeight * (BOARD_PASSAGE + BOARD_TOP),
-        0,
-        innerHeight * BOARD_BOTTOM,
-    );
+    portArea.drawRect(appWidth * PORT_WIDTH, 0, 0, appHeight * BOARD_TOP);
+    portArea.drawRect(appWidth * PORT_WIDTH, appHeight * (BOARD_PASSAGE + BOARD_TOP), 0, appHeight * BOARD_BOTTOM);
     // terminals
     const terminals: ITerminal[] = [];
     for (let i = 0; i < COUNT_TERMINAL; i++) {

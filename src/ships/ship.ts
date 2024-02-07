@@ -1,6 +1,7 @@
 import { Application, Graphics } from "pixi.js";
-import { TERMINAL_WIDTH, ITerminal } from "../terminals/terminal";
-import { PORT_WIDTH, SHIP_SPEED, SHIPS_LENGTH } from "../consts";
+import { ITerminal } from "../terminals/terminal";
+import { PORT_WIDTH, SD, SHIP_SPEED } from "../consts";
+import { appWidth } from "..";
 
 export enum SHIPS_COLORS {
     GREEN = 0x046a26,
@@ -15,46 +16,33 @@ export enum SHIPS_TYPE {
 export interface IShip {
     id: number;
     full: boolean;
-    // frontLeft: number[];
-    // frontRight: number[];
-    // backLeft: number[];
-    // backRight: number[];
+    ships: IShip[];
     graph: Graphics;
     fillingIn(): void;
     fillingOut(): void;
+    shipIntersect(shipOther: IShip): boolean;
+    shipsIntersect(ships: IShip[]): boolean;
     move(app: Application, terminals: ITerminal[]): void;
     stop(): void;
-    // moveBack(): void;
     rotate(rad: number): void;
+    moveTo(x: number, y: number): void;
 }
 
 export class Ship implements IShip {
     id: number;
+    ships: IShip[];
     full: boolean;
-    // frontLeft: number[];
-    // frontRight: number[];
-    // backLeft: number[];
-    // backRight: number[];
     graph: Graphics;
     private _timer: number;
+    private _speed: number;
 
-    constructor(
-        id: number,
-        full: boolean,
-        // frontLeft: number[],
-        // frontRight: number[],
-        // backLeft: number[],
-        // backRight: number[],
-        graph: Graphics,
-    ) {
+    constructor(id: number, ships: IShip[], full: boolean) {
         this.id = id;
+        this.ships = ships;
         this.full = full;
-        // this.frontLeft = frontLeft;
-        // this.frontRight = frontRight;
-        // this.backLeft = backLeft;
-        // this.backRight = backRight;
-        this.graph = graph;
+        this._speed = SHIP_SPEED;
         this._timer = 0;
+        this.graph = new Graphics();
     }
 
     fillingIn() {
@@ -67,43 +55,75 @@ export class Ship implements IShip {
         console.log(`ship ${this.id} is empty`);
     }
 
-    protected changeX(dx: number) {
-        if (this.graph.x < -(innerWidth - TERMINAL_WIDTH - SHIPS_LENGTH - 10)) return;
-        this.graph.x -= dx;
+    protected changeX(direction: boolean | number) {
+        if (Boolean(direction)) this.graph.x += this._speed;
+        else this.graph.x -= this._speed;
+    }
+    protected changeY(dy: number) {
+        this.graph.y += dy;
     }
     rotate(rad: number) {
         this.graph.rotation += rad;
     }
-    protected changeY(dy: number) {
-        if (this.graph.y < -innerHeight / 2 || this.graph.y > innerHeight / 2) return;
-        this.graph.y += dy;
+
+    // move(app: Application, terminals: ITerminal[]) {
+    //     // eslint-disable-next-line @typescript-eslint/no-this-alias
+    //     const savedThis = this;
+
+    //     this._timer = setInterval(() => {
+    //         function update(): void {
+    //
+    //             if (savedThis.graph.x < PORT_WIDTH * appWidth && savedThis.id !== 0) {
+    //                 savedThis.stop();
+    //                 console.log("saved this.graph.x= ", savedThis.graph.x);
+    //             }
+    //             if (savedThis.id == 0 && savedThis.graph.x <appWidth / 2 + SHIPS_LENGTH) {
+    //                 terminals[0].fillingIn();
+    //                 savedThis.fillingOut();
+    //                 savedThis.stop();
+    //                 console.log("0 saved this.graph.x= ", savedThis.graph.x);
+    //             }
+    //             savedThis.changeX(-SHIP_SPEED);
+
+    //             app.render();
+    //         }
+    //         requestAnimationFrame(update);
+    //     }, 16.666666667) as unknown as number;
+    // }
+
+    // stop() {
+    //     clearInterval(this._timer);
+    // }
+
+    move() {
+        if (this.graph.x > PORT_WIDTH * appWidth) this.changeX(0);
+    }
+    moveTo(x: number, y: number) {
+        this.graph.x += x;
+        this.graph.y += y;
+    }
+    shipIntersect(shipOther: IShip) {
+        return (
+            this.graph.x < shipOther.graph.x + shipOther.graph.width + SD &&
+            this.graph.x + this.graph.width + SD > shipOther.graph.x &&
+            this.graph.y < shipOther.graph.y + shipOther.graph.height + SD &&
+            this.graph.y + this.graph.height + SD > shipOther.graph.y
+        );
     }
 
-    move(app: Application, terminals: ITerminal[]) {
-        // eslint-disable-next-line @typescript-eslint/no-this-alias
-        const savedThis = this;
-
-        this._timer = setInterval(() => {
-            savedThis.changeX(SHIP_SPEED);
-
-            function update(): void {
-                savedThis.changeX(SHIP_SPEED);
-                if (savedThis.graph.x < PORT_WIDTH * innerWidth + SHIPS_LENGTH - innerWidth && savedThis.id !== 0) {
-                    savedThis.stop();
+    shipsIntersect(ships: IShip[]): boolean {
+        ships.forEach((ship) => {
+            if (this.id !== ship.id) {
+                if (this.shipIntersect(ship)) {
+                    if (this.id > ship.id) this.stop();
+                    return true;
                 }
-                if (savedThis.id == 0 && savedThis.graph.x < -1050) {
-                    terminals[0].fillingIn();
-                    savedThis.fillingOut();
-                    savedThis.stop();
-                }
-
-                app.render();
             }
-            requestAnimationFrame(update);
-        }, 100) as unknown as number;
+        });
+        return false;
     }
 
     stop() {
-        clearInterval(this._timer);
+        this._speed = 0;
     }
 }

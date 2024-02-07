@@ -9,40 +9,37 @@ const app = new Application<HTMLCanvasElement>({
     background: "#4d35FF",
     resizeTo: window,
 });
+
+export const appHeight = app.renderer.height;
+export const appWidth = app.renderer.width;
 document.body.appendChild(app.view);
 
 //init elements
 
 const terminals: ITerminal[] = initTerminals(app);
-const ships = initShips(app, terminals);
+const ships = initShips(app);
+
+function gameLoop() {
+    if (ships.length) {
+        ships.forEach((ship) => {
+            if (!ship.shipsIntersect(ships)) {
+                ship.move(app, terminals);
+            }
+        });
+    }
+}
 
 app.ticker.add(() => {
-    // console.log("ticker");
-    // if (ships[3]) {
-    //     if (ships[3].graph.x < 300) ships[3].graph.x += 2;
-    //     // console.log("add tickker 3", ships[3].graph.x);
-    // }
-    // if (terminals[2]) {
-    //     terminals[2].graph.x += 2;
-    //     console.log("add tickker 2", terminals[2].graph.x);
-    // }
-    // if (terminals[3]) {
-    //     terminals[3].graph.beginFill(0x046a26, 1);
-    //     terminals[3].graph.endFill();
-    // }
+    gameLoop();
 });
 
 console.log("terminals:", terminals);
 console.log("ships:", ships);
 
-//Filling terminal
-// portArea.beginFill(TERMINAL_COLOR, 1);
-// portArea.lineStyle(10, TERMINAL_COLOR, 1);
-// portArea.drawRect(terminals[0].topRight, terminals[0].topRight, TERMINAL_WIDTH, TERMINAL_LENGTH);
-// portArea.endFill();
+// if (ships[0]) ships[0].fillingIn();
+// app.view.removeChild(app.view.children[2]);
 
 // Add it to the stage to render
-
 // console.log(
 //     `%cPixiJS V7\nTypescript Boilerplate%c ${VERSION} %chttp://www.pixijs.com %c❤️`,
 //     "background: #ff66a1; color: #FFFFFF; padding: 2px 4px; border-radius: 2px; font-weight: bold;",
