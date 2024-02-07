@@ -18,6 +18,7 @@ export interface IShip {
     full: boolean;
     ships: IShip[];
     graph: Graphics;
+    type?: string;
     fillingIn(): void;
     fillingOut(): void;
     shipIntersect(shipOther: IShip): boolean;
@@ -99,8 +100,12 @@ export class Ship implements IShip {
         if (this.graph.x > PORT_WIDTH * appWidth) this.changeX(0);
     }
     moveTo(x: number, y: number) {
-        this.graph.x += x;
-        this.graph.y += y;
+        // this._speed = SHIP_SPEED;
+        // this.graph.x += this._speed;
+        // this.graph.y += this._speed;
+        this.graph.x = x;
+        this.graph.y = y;
+        this._speed = 0;
     }
     shipIntersect(shipOther: IShip) {
         return (

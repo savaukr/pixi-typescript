@@ -1,9 +1,10 @@
+// import { IShip } from "./ships/ship";
 import { Application } from "pixi.js";
 import { initTerminals } from "./terminals/serveTerminal";
 
 import { initShips } from "./ships/serveShip";
 import "./style.css";
-import { ITerminal } from "./terminals/terminal";
+import { ITerminal, TERMINAL_LENGTH } from "./terminals/terminal";
 
 const app = new Application<HTMLCanvasElement>({
     background: "#4d35FF",
@@ -15,9 +16,10 @@ export const appWidth = app.renderer.width;
 document.body.appendChild(app.view);
 
 //init elements
-
+const queueBringIds: number[] = [];
+const queueTakeoutIds: number[] = [];
 const terminals: ITerminal[] = initTerminals(app);
-const ships = initShips(app);
+const ships = initShips(app, queueBringIds, queueTakeoutIds);
 
 function gameLoop() {
     if (ships.length) {
@@ -27,14 +29,35 @@ function gameLoop() {
             }
         });
     }
+    checkTerminals(terminals);
 }
 
 app.ticker.add(() => {
     gameLoop();
 });
 
+function checkTerminals(terminals: ITerminal[]): void {
+    terminals.forEach((terminal) => {
+        if (terminal.full) {
+            const pickingId = queueTakeoutIds.shift();
+            if (pickingId) ships[pickingId].moveTo(terminal.topRight[0], terminal.topRight[1] + TERMINAL_LENGTH / 2);
+            setTimeout(() => {
+                if (pickingId) ships[pickingId].moveTo(innerWidth, innerHeight / 2);
+            }, 5000);
+        } else {
+            const bringingId = queueBringIds.shift();
+            if (bringingId) ships[bringingId].moveTo(terminal.topRight[0], terminal.topRight[1] + TERMINAL_LENGTH / 2);
+            setTimeout(() => {
+                if (bringingId) ships[bringingId].moveTo(innerWidth, innerHeight / 2);
+            }, 5000);
+        }
+    });
+}
+// checkTerminals(terminals);
 console.log("terminals:", terminals);
 console.log("ships:", ships);
+console.log("queueBring:", queueBringIds);
+console.log("queueTakeout:", queueTakeoutIds);
 
 // if (ships[0]) ships[0].fillingIn();
 // app.view.removeChild(app.view.children[2]);
