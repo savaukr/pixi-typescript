@@ -22,20 +22,21 @@ const terminals: ITerminal[] = initTerminals(app);
 const ships = initShips(app, queueBringIds, queueTakeoutIds);
 
 function gameLoop() {
-    if (ships.length) {
-        ships.forEach((ship) => {
-            if (!ship.shipsIntersect(ships)) {
-                ship.move(app, terminals);
+    const shipArr = Object.keys(ships);
+    if (shipArr.length) {
+        shipArr.forEach((id: string) => {
+            if (!ships[id].shipsIntersect(ships)) {
+                ships[id].move(app, terminals);
             }
         });
     }
-    checkTerminals(terminals);
+    // checkTerminals(terminals);
 }
 
 app.ticker.add(() => {
     gameLoop();
 });
-
+checkTerminals(terminals);
 function checkTerminals(terminals: ITerminal[]): void {
     terminals.forEach((terminal) => {
         if (terminal.full) {

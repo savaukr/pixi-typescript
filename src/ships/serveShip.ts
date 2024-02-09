@@ -1,12 +1,12 @@
 import { ShipBring } from "./shipBring";
 import { ShipTakeOut } from "./shipTakeOut";
-import { IShip, Ship } from "./ship";
+import { IShip, Ship, TShips } from "./ship";
 import { Application } from "pixi.js";
 
 export function initShip(
     app: Application,
     id: number,
-    ships: IShip[],
+    ships: TShips,
     queueBring: number[],
     queueTakeout: number[],
 ): IShip {
@@ -26,18 +26,18 @@ export function initShip(
     }
 }
 
-export function initShips(app: Application, queueBring: number[], queueTakeout: number[]): IShip[] {
+export function initShips(app: Application, queueBring: number[], queueTakeout: number[]): TShips {
     let id = 0;
-    const ships: IShip[] = [];
+    const ships: TShips = {};
     const ship = initShip(app, id, ships, queueBring, queueTakeout);
     id++;
-    ships.push(ship);
+    ships[id] = ship;
     // ship.move(app, terminals);
 
     function createShip(): void {
-        if (ships.length < 4) {
+        if (Object.keys(ships).length < 4) {
             const ship = initShip(app, id, ships, queueBring, queueTakeout);
-            ships.push(ship);
+            ships[id] = ship;
             app.stage.addChild(ship.graph);
             // ship.move(app, terminals);
             id++;

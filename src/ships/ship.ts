@@ -13,16 +13,18 @@ export enum SHIPS_TYPE {
     TAKEOUT = "takeout",
 }
 
+export type TShips = { [id: string]: IShip };
+
 export interface IShip {
     id: number;
     full: boolean;
-    ships: IShip[];
+    ships: TShips;
     graph: Graphics;
     type?: string;
     fillingIn(): void;
     fillingOut(): void;
     shipIntersect(shipOther: IShip): boolean;
-    shipsIntersect(ships: IShip[]): boolean;
+    shipsIntersect(ships: TShips): boolean;
     move(app: Application, terminals: ITerminal[]): void;
     stop(): void;
     rotate(rad: number): void;
@@ -31,13 +33,13 @@ export interface IShip {
 
 export class Ship implements IShip {
     id: number;
-    ships: IShip[];
+    ships: TShips;
     full: boolean;
     graph: Graphics;
     private _timer: number;
     private _speed: number;
 
-    constructor(id: number, ships: IShip[], full: boolean) {
+    constructor(id: number, ships: TShips, full: boolean) {
         this.id = id;
         this.ships = ships;
         this.full = full;
@@ -116,11 +118,12 @@ export class Ship implements IShip {
         );
     }
 
-    shipsIntersect(ships: IShip[]): boolean {
-        ships.forEach((ship) => {
-            if (this.id !== ship.id) {
-                if (this.shipIntersect(ship)) {
-                    if (this.id > ship.id) this.stop();
+    shipsIntersect(ships: TShips): boolean {
+        const shipArr = Object.keys(ships);
+        shipArr.forEach((id: string) => {
+            if (this.id !== Number(id)) {
+                if (this.shipIntersect(ships[id])) {
+                    if (this.id > ships[id].id) this.stop();
                     return true;
                 }
             }

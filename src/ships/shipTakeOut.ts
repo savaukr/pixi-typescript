@@ -1,11 +1,11 @@
 import { appHeight, appWidth } from "..";
 import { SHIPS_LENGTH, SHIPS_WIDTH } from "../consts";
-import { IShip, Ship, SHIPS_COLORS, SHIPS_TYPE } from "./ship";
+import { Ship, SHIPS_COLORS, SHIPS_TYPE, TShips } from "./ship";
 
 export class ShipTakeOut extends Ship {
     type: string;
 
-    constructor(id: number, ships: IShip[]) {
+    constructor(id: number, ships: TShips) {
         super(id, ships, false);
         this.type = SHIPS_TYPE.TAKEOUT;
         this.graph.beginFill(SHIPS_COLORS.GREEN, 0);
