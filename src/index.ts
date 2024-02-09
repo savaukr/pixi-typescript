@@ -42,13 +42,21 @@ function checkTerminals(terminals: ITerminal[]): void {
             const pickingId = queueTakeoutIds.shift();
             if (pickingId) ships[pickingId].moveTo(terminal.topRight[0], terminal.topRight[1] + TERMINAL_LENGTH / 2);
             setTimeout(() => {
-                if (pickingId) ships[pickingId].moveTo(innerWidth, innerHeight / 2);
+                terminal.fillingOut();
+                if (pickingId) {
+                    ships[pickingId].fillingIn;
+                    ships[pickingId].moveTo(innerWidth, innerHeight / 2);
+                }
             }, 5000);
         } else {
             const bringingId = queueBringIds.shift();
             if (bringingId) ships[bringingId].moveTo(terminal.topRight[0], terminal.topRight[1] + TERMINAL_LENGTH / 2);
             setTimeout(() => {
-                if (bringingId) ships[bringingId].moveTo(innerWidth, innerHeight / 2);
+                terminal.fillingIn();
+                if (bringingId) {
+                    ships[bringingId].fillingOut;
+                    ships[bringingId].moveTo(innerWidth, innerHeight / 2);
+                }
             }, 5000);
         }
     });
