@@ -14,11 +14,13 @@ export function initShip(
     const rand = Math.floor(1 + Math.random() * (2 + 1 - 1));
     if (rand < 2) {
         ship = new ShipTakeOut(id, ships);
+        ships[id] = ship;
         queueTakeout.push(ship.id);
         app.stage.addChild(ship.graph);
         return ship;
     } else {
         ship = new ShipBring(id, ships);
+        ships[id] = ship;
         queueBring.push(ship.id);
         app.stage.addChild(ship.graph);
 
@@ -30,19 +32,18 @@ export function initShips(app: Application, queueBring: number[], queueTakeout: 
     let id = 0;
     const ships: TShips = {};
     const ship = initShip(app, id, ships, queueBring, queueTakeout);
-    id++;
     ships[id] = ship;
+    id++;
     // ship.move(app, terminals);
-
+    const timerId = setInterval(createShip, 8000);
     function createShip(): void {
-        if (Object.keys(ships).length < 4) {
+        if (id < 4) {
             const ship = initShip(app, id, ships, queueBring, queueTakeout);
             ships[id] = ship;
             app.stage.addChild(ship.graph);
             // ship.move(app, terminals);
             id++;
-        }
+        } else clearInterval(timerId);
     }
-    setInterval(createShip, 8000);
     return ships;
 }

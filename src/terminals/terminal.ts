@@ -43,7 +43,7 @@ export class Terminal implements ITerminal {
         this.full = true;
         this.graph.clear();
         this.graph.beginFill(TERMINAL_COLOR, 1);
-        // this.graph.lineStyle(10, TERMINAL_COLOR, 1);
+        this.graph.lineStyle(10, TERMINAL_COLOR, 1);
         this.graph.drawRect(0, this.topRight[1], TERMINAL_WIDTH, TERMINAL_LENGTH);
         this.graph.endFill();
         console.log(`terminal ${this.id} is full`);

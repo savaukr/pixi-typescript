@@ -25,10 +25,10 @@ export interface IShip {
     fillingOut(): void;
     shipIntersect(shipOther: IShip): boolean;
     shipsIntersect(ships: TShips): boolean;
-    move(app: Application, terminals: ITerminal[]): void;
+    moveToPort(app: Application, terminals: ITerminal[]): Promise<void>;
     stop(): void;
     rotate(rad: number): void;
-    moveTo(x: number, y: number): void;
+    moveTo(x: number, y: number): Promise<void>;
 }
 
 export class Ship implements IShip {
@@ -36,16 +36,20 @@ export class Ship implements IShip {
     ships: TShips;
     full: boolean;
     graph: Graphics;
-    private _timer: number;
-    private _speed: number;
+    private _stopX: number;
+    private _stopY: number;
+    private _speedX: number;
+    private _speedY: number;
 
     constructor(id: number, ships: TShips, full: boolean) {
         this.id = id;
         this.ships = ships;
         this.full = full;
-        this._speed = SHIP_SPEED;
-        this._timer = 0;
+        this._speedX = SHIP_SPEED;
+        this._speedY = SHIP_SPEED;
         this.graph = new Graphics();
+        this._stopX = 0;
+        this._stopY = 0;
     }
 
     fillingIn() {
@@ -58,18 +62,19 @@ export class Ship implements IShip {
         console.log(`ship ${this.id} is empty`);
     }
 
-    protected changeX(direction: boolean | number) {
-        if (Boolean(direction)) this.graph.x += this._speed;
-        else this.graph.x -= this._speed;
+    protected changeX(direction: boolean | number, speed: number) {
+        if (Boolean(direction)) this.graph.x += speed;
+        else this.graph.x -= speed;
     }
-    protected changeY(dy: number) {
-        this.graph.y += dy;
+    protected changeY(direction: boolean | number, speed: number) {
+        if (Boolean(direction)) this.graph.y += speed;
+        this.graph.y += speed;
     }
     rotate(rad: number) {
         this.graph.rotation += rad;
     }
 
-    // move(app: Application, terminals: ITerminal[]) {
+    // moveToPort(app: Application, terminals: ITerminal[]) {
     //     // eslint-disable-next-line @typescript-eslint/no-this-alias
     //     const savedThis = this;
 
@@ -98,17 +103,52 @@ export class Ship implements IShip {
     //     clearInterval(this._timer);
     // }
 
-    move() {
-        if (this.graph.x > PORT_WIDTH * appWidth) this.changeX(0);
+    async moveToPort(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            try {
+                if (this.graph.x > PORT_WIDTH * appWidth) {
+                    this.changeX(0, this._speedX);
+                } else {
+                    this.stop();
+                    resolve();
+                }
+            } catch {
+                reject();
+            }
+        });
     }
-    moveTo(x: number, y: number) {
-        // this._speed = SHIP_SPEED;
-        // this.graph.x += this._speed;
-        // this.graph.y += this._speed;
-        this.graph.x = x;
-        this.graph.y = y;
-        this._speed = 0;
+    async moveTo(x: number, y: number): Promise<void> {
+        return new Promise((resolve, reject) => {
+            try {
+                if (this._speedX !== 0 || this._speedY !== 0) {
+                    this.changeX(this.graph.x < x, this._speedX);
+                    this.changeY(this.graph.y < y, this._speedY);
+                } else {
+                    const distanceX: number = this._stopX - x;
+                    const distanceY: number = this._stopY - y;
+                    const distanceTotal: number = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+                    this._speedX = (distanceX / distanceTotal) * SHIP_SPEED;
+                    this._speedY = (distanceY / distanceTotal) * SHIP_SPEED;
+
+                    this.changeX(distanceX > 0, this._speedX);
+                    this.changeY(distanceY > 0, this._speedY);
+                }
+
+                if (this.graph.x - x < this._speedX) {
+                    this.graph.x = x;
+                    this._speedX = 0;
+                }
+                if (this.graph.y - y < this._speedY) {
+                    this.graph.y = y;
+                    this._speedY = 0;
+                }
+                if (!this._speedX && !this._speedY) resolve();
+            } catch {
+                reject();
+            }
+        });
     }
+
     shipIntersect(shipOther: IShip) {
         return (
             this.graph.x < shipOther.graph.x + shipOther.graph.width + SD &&
@@ -132,6 +172,9 @@ export class Ship implements IShip {
     }
 
     stop() {
-        this._speed = 0;
+        this._stopX = this.graph.x;
+        this._stopY = this.graph.y;
+        this._speedX = 0;
+        this._speedY = 0;
     }
 }

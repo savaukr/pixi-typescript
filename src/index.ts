@@ -26,25 +26,29 @@ function gameLoop() {
     if (shipArr.length) {
         shipArr.forEach((id: string) => {
             if (!ships[id].shipsIntersect(ships)) {
-                ships[id].move(app, terminals);
+                ships[id].moveToPort(app, terminals);
             }
         });
     }
-    // checkTerminals(terminals);
+    checkTerminals(terminals);
+    console.log("ships:", ships);
+    console.log("terminals", terminals);
+    console.log("queueBring:", queueBringIds);
+    console.log("queueTakeout:", queueTakeoutIds);
 }
 
 app.ticker.add(() => {
     gameLoop();
 });
-checkTerminals(terminals);
+
 function checkTerminals(terminals: ITerminal[]): void {
     terminals.forEach((terminal) => {
         if (terminal.full) {
             const pickingId = queueTakeoutIds.shift();
             if (pickingId) ships[pickingId].moveTo(terminal.topRight[0], terminal.topRight[1] + TERMINAL_LENGTH / 2);
             setTimeout(() => {
-                terminal.fillingOut();
                 if (pickingId) {
+                    terminal.fillingOut();
                     ships[pickingId].fillingIn;
                     ships[pickingId].moveTo(innerWidth, innerHeight / 2);
                 }
@@ -53,8 +57,8 @@ function checkTerminals(terminals: ITerminal[]): void {
             const bringingId = queueBringIds.shift();
             if (bringingId) ships[bringingId].moveTo(terminal.topRight[0], terminal.topRight[1] + TERMINAL_LENGTH / 2);
             setTimeout(() => {
-                terminal.fillingIn();
                 if (bringingId) {
+                    terminal.fillingIn();
                     ships[bringingId].fillingOut;
                     ships[bringingId].moveTo(innerWidth, innerHeight / 2);
                 }
@@ -62,11 +66,8 @@ function checkTerminals(terminals: ITerminal[]): void {
         }
     });
 }
-// checkTerminals(terminals);
+
 console.log("terminals:", terminals);
-console.log("ships:", ships);
-console.log("queueBring:", queueBringIds);
-console.log("queueTakeout:", queueTakeoutIds);
 
 // if (ships[0]) ships[0].fillingIn();
 // app.view.removeChild(app.view.children[2]);
