@@ -15,7 +15,6 @@ export class ShipBring extends Ship {
         this.graph.endFill();
     }
     fillingIn() {
-        this.full = true;
         this.graph.clear();
         this.graph.beginFill(SHIPS_COLORS.RED, 1);
         this.graph.lineStyle(10, SHIPS_COLORS.RED, 1);
@@ -23,7 +22,6 @@ export class ShipBring extends Ship {
         this.graph.endFill();
     }
     fillingOut() {
-        this.full = true;
         this.graph.clear();
         this.graph.beginFill(SHIPS_COLORS.RED, 0);
         this.graph.lineStyle(10, SHIPS_COLORS.RED, 1);
