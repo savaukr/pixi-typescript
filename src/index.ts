@@ -16,25 +16,27 @@ export const appWidth = app.renderer.width;
 document.body.appendChild(app.view);
 
 //init elements
-const queueBringIds: number[] = [];
-const queueTakeoutIds: number[] = [];
+const queueBringIds: string[] = [];
+const queueTakeoutIds: string[] = [];
 const terminals: ITerminal[] = initTerminals(app);
 const ships = initShips(app, queueBringIds, queueTakeoutIds);
 
 function gameLoop() {
     const shipArr = Object.keys(ships);
+
     if (shipArr.length) {
         shipArr.forEach((id: string) => {
             if (!ships[id].shipsIntersect(ships)) {
-                ships[id].moveToPort(app, terminals);
+                ships[id].moveToPort();
             }
         });
+        console.log("shipArr=", shipArr);
+        console.log("ships:", ships);
+        console.log("terminals", terminals);
+        console.log("queueBring:", queueBringIds);
+        console.log("queueTakeout:", queueTakeoutIds);
     }
-    checkTerminals(terminals);
-    console.log("ships:", ships);
-    console.log("terminals", terminals);
-    console.log("queueBring:", queueBringIds);
-    console.log("queueTakeout:", queueTakeoutIds);
+    // checkTerminals(terminals);
 }
 
 app.ticker.add(() => {
@@ -45,28 +47,35 @@ function checkTerminals(terminals: ITerminal[]): void {
     terminals.forEach((terminal) => {
         if (terminal.full) {
             const pickingId = queueTakeoutIds.shift();
-            if (pickingId) ships[pickingId].moveTo(terminal.topRight[0], terminal.topRight[1] + TERMINAL_LENGTH / 2);
-            setTimeout(() => {
-                if (pickingId) {
-                    terminal.fillingOut();
-                    ships[pickingId].fillingIn;
-                    ships[pickingId].moveTo(innerWidth, innerHeight / 2);
-                }
-            }, 5000);
+            if (pickingId) {
+                ships[pickingId].moveTo(terminal.topRight[0], terminal.topRight[1] + TERMINAL_LENGTH / 2).then(() => {
+                    setTimeout(() => {
+                        if (pickingId) {
+                            terminal.fillingOut();
+                            ships[pickingId].fillingIn;
+                            ships[pickingId].moveTo(innerWidth, innerHeight / 2);
+                        }
+                    }, 5000);
+                });
+            }
         } else {
             const bringingId = queueBringIds.shift();
-            if (bringingId) ships[bringingId].moveTo(terminal.topRight[0], terminal.topRight[1] + TERMINAL_LENGTH / 2);
-            setTimeout(() => {
-                if (bringingId) {
-                    terminal.fillingIn();
-                    ships[bringingId].fillingOut;
-                    ships[bringingId].moveTo(innerWidth, innerHeight / 2);
-                }
-            }, 5000);
+            if (bringingId) {
+                ships[bringingId].moveTo(terminal.topRight[0], terminal.topRight[1] + TERMINAL_LENGTH / 2).then(() => {
+                    setTimeout(() => {
+                        if (bringingId) {
+                            terminal.fillingIn();
+                            ships[bringingId].fillingOut;
+                            ships[bringingId].moveTo(innerWidth, innerHeight / 2);
+                        }
+                    }, 5000);
+                });
+            }
         }
     });
 }
 
+checkTerminals(terminals);
 console.log("terminals:", terminals);
 
 // if (ships[0]) ships[0].fillingIn();

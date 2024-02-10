@@ -1,5 +1,5 @@
-import { Application, Graphics } from "pixi.js";
-import { ITerminal } from "../terminals/terminal";
+import { Graphics } from "pixi.js";
+
 import { PORT_WIDTH, SD, SHIP_SPEED } from "../consts";
 import { appWidth } from "..";
 
@@ -13,6 +13,13 @@ export enum SHIPS_TYPE {
     TAKEOUT = "takeout",
 }
 
+export enum SHIP_STATUS {
+    START = "start",
+    PORT = "port",
+    TERMINAL = "terminal",
+    OUT = "out",
+}
+
 export type TShips = { [id: string]: IShip };
 
 export interface IShip {
@@ -21,11 +28,12 @@ export interface IShip {
     ships: TShips;
     graph: Graphics;
     type?: string;
+    status: SHIP_STATUS;
     fillingIn(): void;
     fillingOut(): void;
     shipIntersect(shipOther: IShip): boolean;
     shipsIntersect(ships: TShips): boolean;
-    moveToPort(app: Application, terminals: ITerminal[]): Promise<void>;
+    moveToPort(): Promise<void>;
     stop(): void;
     rotate(rad: number): void;
     moveTo(x: number, y: number): Promise<void>;
@@ -36,6 +44,7 @@ export class Ship implements IShip {
     ships: TShips;
     full: boolean;
     graph: Graphics;
+    status: SHIP_STATUS;
     private _stopX: number;
     private _stopY: number;
     private _speedX: number;
@@ -45,9 +54,10 @@ export class Ship implements IShip {
         this.id = id;
         this.ships = ships;
         this.full = full;
+        this.graph = new Graphics();
+        this.status = SHIP_STATUS.START;
         this._speedX = SHIP_SPEED;
         this._speedY = SHIP_SPEED;
-        this.graph = new Graphics();
         this._stopX = 0;
         this._stopY = 0;
     }
@@ -74,41 +84,13 @@ export class Ship implements IShip {
         this.graph.rotation += rad;
     }
 
-    // moveToPort(app: Application, terminals: ITerminal[]) {
-    //     // eslint-disable-next-line @typescript-eslint/no-this-alias
-    //     const savedThis = this;
-
-    //     this._timer = setInterval(() => {
-    //         function update(): void {
-    //
-    //             if (savedThis.graph.x < PORT_WIDTH * appWidth && savedThis.id !== 0) {
-    //                 savedThis.stop();
-    //                 console.log("saved this.graph.x= ", savedThis.graph.x);
-    //             }
-    //             if (savedThis.id == 0 && savedThis.graph.x <appWidth / 2 + SHIPS_LENGTH) {
-    //                 terminals[0].fillingIn();
-    //                 savedThis.fillingOut();
-    //                 savedThis.stop();
-    //                 console.log("0 saved this.graph.x= ", savedThis.graph.x);
-    //             }
-    //             savedThis.changeX(-SHIP_SPEED);
-
-    //             app.render();
-    //         }
-    //         requestAnimationFrame(update);
-    //     }, 16.666666667) as unknown as number;
-    // }
-
-    // stop() {
-    //     clearInterval(this._timer);
-    // }
-
     async moveToPort(): Promise<void> {
         return new Promise((resolve, reject) => {
             try {
                 if (this.graph.x > PORT_WIDTH * appWidth) {
                     this.changeX(0, this._speedX);
                 } else {
+                    this.status = SHIP_STATUS.PORT;
                     this.stop();
                     resolve();
                 }
@@ -172,6 +154,7 @@ export class Ship implements IShip {
     }
 
     stop() {
+        if (this.status === SHIP_STATUS.START) this.status = SHIP_STATUS.PORT;
         this._stopX = this.graph.x;
         this._stopY = this.graph.y;
         this._speedX = 0;
