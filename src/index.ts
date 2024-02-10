@@ -4,7 +4,7 @@ import { checkTerminals, initTerminals } from "./terminals/serveTerminal";
 import { initShips } from "./ships/serveShip";
 import "./style.css";
 import { ITerminal } from "./terminals/terminal";
-import { SHIP_STATUS } from "./ships/ship";
+import { SHIPS_TYPE, SHIP_STATUS } from "./ships/ship";
 
 const app = new Application<HTMLCanvasElement>({
     background: "#4d35FF",
@@ -32,7 +32,18 @@ function gameLoop() {
 
             if (ships[id].status === SHIP_STATUS.PORT) {
                 const terminal = checkTerminals(terminals, id, queueTakeoutIds, queueBringIds);
-                if (terminal) ships[id].moveToTerminal(terminal).then(() => console.log("ship in terminal"));
+                if (terminal)
+                    ships[id].moveToTerminal(terminal).then((id) => {
+                        if (ships[id].type === SHIPS_TYPE.BRING) {
+                            terminal.fillingIn();
+                            ships[id].fillingOut();
+                            queueBringIds.shift();
+                        } else {
+                            terminal.fillingOut();
+                            ships[id].fillingIn();
+                            queueTakeoutIds.shift();
+                        }
+                    });
             }
         });
         // console.log("shipArr=", shipArr);
@@ -47,9 +58,9 @@ app.ticker.add(() => {
     gameLoop();
 });
 
-console.log(checkTerminals);
-console.log("terminals:", terminals);
-console.log("ships:", ships);
+// console.log(checkTerminals);
+// console.log("terminals:", terminals);
+// console.log("ships:", ships);
 
 // if (ships[0]) ships[0].fillingIn();
 // app.view.removeChild(app.view.children[2]);

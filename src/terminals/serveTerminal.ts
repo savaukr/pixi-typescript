@@ -37,19 +37,15 @@ export function checkTerminals(
     queueBringIds: string[],
 ): TIs_Terminal {
     let founded = null;
-    console.log(queueTakeoutIds);
-    console.log(queueBringIds);
     let i = 0;
     while (i < terminals.length && !founded) {
         if (!terminals[i].full && queueBringIds.length) {
             if (queueBringIds[0] === shipId) {
-                // queueBringIds.shift();
                 founded = terminals[i];
             }
         }
         if (terminals[i].full && queueTakeoutIds.length) {
             if (queueTakeoutIds[0] === shipId) {
-                // queueTakeoutIds.shift();
                 founded = terminals[i];
             }
         }

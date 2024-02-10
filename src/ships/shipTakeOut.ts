@@ -16,21 +16,19 @@ export class ShipTakeOut extends Ship {
         this.graph.endFill();
     }
     fillingIn() {
-        this.full = true;
+        // this.full = true;
         this.graph.clear();
         this.graph.beginFill(SHIPS_COLORS.GREEN, 1);
         this.graph.lineStyle(10, SHIPS_COLORS.GREEN, 1);
         this.graph.drawRect(this.graph.position.x, this.graph.position.y, SHIPS_WIDTH, SHIPS_LENGTH);
         this.graph.endFill();
-        console.log(`ship ${this.id} is full`);
     }
     fillingOut() {
-        this.full = true;
+        // this.full = false;
         this.graph.clear();
-        this.graph.beginFill(SHIPS_COLORS.GREEN, 1);
+        this.graph.beginFill(SHIPS_COLORS.GREEN, 0);
         this.graph.lineStyle(10, SHIPS_COLORS.GREEN, 1);
         this.graph.drawRect(this.graph.position.x, this.graph.position.y, SHIPS_WIDTH, SHIPS_LENGTH);
         this.graph.endFill();
-        console.log(`ship ${this.id} is empty`);
     }
 }

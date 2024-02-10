@@ -38,7 +38,7 @@ export interface IShip {
     shipsIntersect(ships: TShips): boolean;
     moveTo(x: number, y: number): Promise<void>;
     moveToPort(): Promise<void>;
-    moveToTerminal(terminal: ITerminal): Promise<void>;
+    moveToTerminal(terminal: ITerminal): Promise<number>;
     stop(): void;
 }
 
@@ -67,12 +67,10 @@ export class Ship implements IShip {
 
     fillingIn() {
         this.full = true;
-        console.log(`ship ${this.id} is full`);
     }
 
     fillingOut() {
         this.full = false;
-        console.log(`ship ${this.id} is empty`);
     }
 
     protected changeX(direction: boolean | number, speed: number) {
@@ -128,7 +126,7 @@ export class Ship implements IShip {
                 }
                 if (!this.speedX && !this.speedY) {
                     resolve();
-                    console.log("ship is stoped in moveTo");
+                    console.log(`${this.id} ship is stoped in moveTo`);
                 }
             } catch {
                 reject();
@@ -136,8 +134,13 @@ export class Ship implements IShip {
         });
     }
 
-    async moveToTerminal(terminal: ITerminal): Promise<void> {
-        return this.moveTo(terminal.bottomRight[0], terminal.bottomRight[1] - TERMINAL_LENGTH / 2 - SHIPS_WIDTH / 2);
+    async moveToTerminal(terminal: ITerminal): Promise<number> {
+        return this.moveTo(
+            terminal.bottomRight[0],
+            terminal.bottomRight[1] - TERMINAL_LENGTH / 2 - SHIPS_WIDTH / 2,
+        ).then(() => {
+            return this.id;
+        });
     }
 
     shipIntersect(shipOther: IShip) {
@@ -169,7 +172,8 @@ export class Ship implements IShip {
         if (this.status === SHIP_STATUS.START) this.status = SHIP_STATUS.PORT;
         this._stopX = this.graph.x;
         this._stopY = this.graph.y;
-        // console.log("ship is stoped in stop()");
+        console.log(`${this.id} ship is stoped in stop()`);
+
         this.speedX = 0;
         this.speedY = 0;
     }
