@@ -75,7 +75,8 @@ function checkTerminals(terminals: ITerminal[]): void {
     });
 }
 
-checkTerminals(terminals);
+// checkTerminals(terminals);
+console.log(checkTerminals);
 console.log("terminals:", terminals);
 
 // if (ships[0]) ships[0].fillingIn();
