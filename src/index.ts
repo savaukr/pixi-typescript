@@ -34,33 +34,45 @@ function gameLoop() {
 
             if (ships[id].status === SHIP_STATUS.PORT) {
                 const terminal = checkTerminals(terminals, id, queueTakeoutIds, queueBringIds);
-                if (terminal)
-                    ships[id]
-                        .moveToTerminal(terminal)
-                        .then((id) => {
-                            if (ships[id].type === SHIPS_TYPE.BRING) {
-                                return new Promise((resolve) => {
-                                    function fillOut() {
-                                        terminal?.fillingIn();
-                                        ships[id].fillingOut();
-                                        queueBringIds.shift();
-                                        resolve(id);
-                                    }
-                                    ships[id].timer = window.setTimeout(fillOut, TIME_IN_TERMINAL);
-                                });
-                            } else {
-                                return new Promise((resolve) => {
-                                    function fillIn() {
-                                        terminal?.fillingOut();
-                                        ships[id].fillingIn();
-                                        queueTakeoutIds.shift();
-                                        resolve(id);
-                                    }
-                                    ships[id].timer = window.setTimeout(fillIn, TIME_IN_TERMINAL);
-                                });
-                            }
-                        })
-                        .then((id) => console.log(`${id} in terminal end`));
+                if (terminal) {
+                    ships[id].moveToTerminal(terminal).then((id) => {
+                        ships[id].status = SHIP_STATUS.TERMINAL;
+
+                        if (ships[id].type === SHIPS_TYPE.BRING) {
+                            //if nee a few ship of one type  one time  in port
+                            // queueBringIds.shift();
+                            // terminal.full = true;
+                            return new Promise((resolve) => {
+                                function fillOut() {
+                                    terminal?.fillingIn();
+                                    ships[id].fillingOut();
+                                    queueBringIds.shift();
+                                    ships[id].status = SHIP_STATUS.OUT;
+                                    resolve(id);
+                                }
+                                ships[id].timer = window.setTimeout(fillOut, TIME_IN_TERMINAL);
+                            });
+                        } else {
+                            //if nee a few ship of one type  one time  in port
+                            // queueTakeoutIds.shift();
+                            // terminal.full = false;
+                            return new Promise((resolve) => {
+                                function fillIn() {
+                                    terminal?.fillingOut();
+                                    ships[id].fillingIn();
+                                    queueTakeoutIds.shift();
+                                    ships[id].status = SHIP_STATUS.OUT;
+                                    resolve(id);
+                                }
+                                ships[id].timer = window.setTimeout(fillIn, TIME_IN_TERMINAL);
+                            });
+                        }
+                    });
+                }
+            }
+            if (ships[id].status === SHIP_STATUS.OUT) {
+                console.log("OUT");
+                ships[id].moveToOut();
             }
         });
     }
@@ -70,10 +82,10 @@ app.ticker.add(() => {
     gameLoop();
 });
 
-setTimeout(() => {
-    console.log("ships:", ships);
-    console.log("terminals", terminals);
-}, 15000);
+// setTimeout(() => {
+//     console.log("ships:", ships);
+//     console.log("terminals", terminals);
+// }, 15000);
 // console.log(checkTerminals);
 
 // if (ships[0]) ships[0].fillingIn();

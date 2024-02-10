@@ -2,7 +2,7 @@ import { Graphics } from "pixi.js";
 
 import { PORT_WIDTH, SD, SHIPS_WIDTH, SHIP_SPEED } from "../consts";
 import { appWidth } from "..";
-import { ITerminal, TERMINAL_LENGTH } from "../terminals/terminal";
+import { ITerminal, TERMINAL_LENGTH, TERMINAL_WIDTH } from "../terminals/terminal";
 
 export enum SHIPS_COLORS {
     GREEN = 0x046a26,
@@ -39,6 +39,7 @@ export interface IShip {
     shipsIntersect(ships: TShips): boolean;
     moveTo(x: number, y: number): Promise<void>;
     moveToPort(): Promise<void>;
+    moveToOut(): Promise<void>;
     moveToTerminal(terminal: ITerminal): Promise<number>;
     stop(): void;
 }
@@ -82,7 +83,7 @@ export class Ship implements IShip {
     }
     protected changeY(direction: boolean | number, speed: number) {
         if (Boolean(direction)) this.graph.y += speed;
-        this.graph.y -= speed;
+        else this.graph.y -= speed;
     }
     protected rotate(rad: number) {
         this.graph.rotation += rad;
@@ -113,23 +114,29 @@ export class Ship implements IShip {
                     const distanceX: number = this._stopX - x;
                     const distanceY: number = this._stopY - y;
                     const distanceTotal: number = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+                    if (!distanceTotal) {
+                        resolve();
+                        this.stop();
+                    }
                     this.speedX = Math.abs((distanceX / distanceTotal) * SHIP_SPEED);
                     this.speedY = Math.abs((distanceY / distanceTotal) * SHIP_SPEED);
                     this.changeX(distanceX < 0, this.speedX);
                     this.changeY(distanceY < 0, this.speedY);
                 }
 
-                if (this.graph.x - x < this.speedX) {
+                if (Math.abs(this.graph.x - x) < this.speedX) {
                     this.graph.x = x;
                     this.speedX = 0;
                 }
-                if (this.graph.y - y < this.speedY) {
+                if (Math.abs(this.graph.y - y) < this.speedY) {
                     this.graph.y = y;
                     this.speedY = 0;
                 }
                 if (!this.speedX && !this.speedY) {
+                    this._stopX = this.graph.x;
+                    this._stopY = this.graph.y;
+                    console.log("this=", this);
                     resolve();
-                    console.log(`${this.id} ship is stoped in moveTo`);
                 }
             } catch {
                 reject();
@@ -143,6 +150,52 @@ export class Ship implements IShip {
             terminal.bottomRight[1] - TERMINAL_LENGTH / 2 - SHIPS_WIDTH / 2,
         ).then(() => {
             return this.id;
+        });
+    }
+
+    async moveToOut(): Promise<void> {
+        const x = innerWidth * PORT_WIDTH;
+        const y = innerHeight / 2 - TERMINAL_WIDTH / 2;
+        // this.moveTo(x, y);
+
+        return new Promise((resolve, reject) => {
+            try {
+                if (this.speedX !== 0 || this.speedY !== 0) {
+                    this.changeX(this.graph.x < x, this.speedX);
+                    this.changeY(this.graph.y < y, this.speedY);
+                } else {
+                    const distanceX: number = this._stopX - x;
+                    const distanceY: number = this._stopY - y;
+                    const distanceTotal: number = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+                    console.log("distanceTotal:", distanceTotal);
+                    if (!distanceTotal) {
+                        this.stop();
+                        resolve();
+                    }
+                    this.speedX = Math.abs((distanceX / distanceTotal) * SHIP_SPEED);
+                    this.speedY = Math.abs((distanceY / distanceTotal) * SHIP_SPEED);
+                    this.changeX(distanceX < 0, this.speedX);
+                    this.changeY(distanceY < 0, this.speedY);
+                }
+
+                if (Math.abs(this.graph.x - x) < this.speedX) {
+                    this.graph.x = x;
+                    this.speedX = 0;
+                }
+                if (Math.abs(this.graph.y - y) < this.speedY) {
+                    this.graph.y = y;
+                    this.speedY = 0;
+                }
+                if (!this.speedX && !this.speedY) {
+                    this._stopX = this.graph.x;
+                    this._stopY = this.graph.y;
+                    this.stop();
+                    resolve();
+                }
+            } catch {
+                reject();
+                console.log("ERRROR");
+            }
         });
     }
 
@@ -161,7 +214,6 @@ export class Ship implements IShip {
             if (this.id !== Number(id)) {
                 if (this.shipIntersect(ships[id])) {
                     if (this.id > ships[id].id && this.speedX && this.speedY) {
-                        // console.log(`${this.id} ship is stoped inshipsIntersect()`);
                         this.stop();
                     }
                     return true;
@@ -175,8 +227,6 @@ export class Ship implements IShip {
         if (this.status === SHIP_STATUS.START) this.status = SHIP_STATUS.PORT;
         this._stopX = this.graph.x;
         this._stopY = this.graph.y;
-        // console.log(`${this.id} ship is stoped in stop()`);
-
         this.speedX = 0;
         this.speedY = 0;
     }

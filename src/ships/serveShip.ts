@@ -11,8 +11,9 @@ export function initShip(
     queueTakeoutIds: string[],
 ): IShip {
     let ship: Ship;
-    const rand = Math.floor(1 + Math.random() * (2 + 1 - 1));
-    if (rand < 2) {
+    // const rand = Math.floor(1 + Math.random() * (2 + 1 - 1));
+    // if (rand < 2) {
+    if (false) {
         ship = new ShipTakeOut(id, ships);
         ships[id] = ship;
         queueTakeoutIds.push(id.toString());
@@ -37,7 +38,7 @@ export function initShips(app: Application, queueBringIds: string[], queueTakeou
     const timerId = setInterval(createShip, 3000);
 
     function createShip(): void {
-        if (id < 14) {
+        if (id < 1) {
             const ship = initShip(app, id, ships, queueBringIds, queueTakeoutIds);
             ships[id] = ship;
             app.stage.addChild(ship.graph);
