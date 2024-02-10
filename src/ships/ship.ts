@@ -32,6 +32,7 @@ export interface IShip {
     status: SHIP_STATUS;
     speedX: number;
     speedY: number;
+    timer: number | null;
     fillingIn(): void;
     fillingOut(): void;
     shipIntersect(shipOther: IShip): boolean;
@@ -52,6 +53,7 @@ export class Ship implements IShip {
     private _stopY: number;
     speedX: number;
     speedY: number;
+    timer: number | null;
 
     constructor(id: number, ships: TShips, full: boolean) {
         this.id = id;
@@ -63,6 +65,7 @@ export class Ship implements IShip {
         this.speedY = SHIP_SPEED;
         this._stopX = 0;
         this._stopY = 0;
+        this.timer = null;
     }
 
     fillingIn() {
@@ -126,7 +129,7 @@ export class Ship implements IShip {
                 }
                 if (!this.speedX && !this.speedY) {
                     resolve();
-                    // console.log(`${this.id} ship is stoped in moveTo`);
+                    console.log(`${this.id} ship is stoped in moveTo`);
                 }
             } catch {
                 reject();
@@ -176,5 +179,10 @@ export class Ship implements IShip {
 
         this.speedX = 0;
         this.speedY = 0;
+    }
+
+    remove() {
+        // app.stage.removeChild(this.graph);
+        this.graph.destroy();
     }
 }

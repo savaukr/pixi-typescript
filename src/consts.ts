@@ -10,3 +10,4 @@ export const SHIP_SPEED = 5;
 export const SD = 20; //safe distance between ships
 
 export const COUNT_TERMINAL = 4;
+export const TIME_IN_TERMINAL = 5000;

@@ -6,6 +6,8 @@ import "./style.css";
 import { ITerminal } from "./terminals/terminal";
 import { SHIPS_TYPE, SHIP_STATUS } from "./ships/ship";
 
+import { TIME_IN_TERMINAL } from "./consts";
+
 const app = new Application<HTMLCanvasElement>({
     background: "#4d35FF",
     resizeTo: window,
@@ -37,15 +39,26 @@ function gameLoop() {
                         .moveToTerminal(terminal)
                         .then((id) => {
                             if (ships[id].type === SHIPS_TYPE.BRING) {
-                                terminal.fillingIn();
-                                ships[id].fillingOut();
-                                queueBringIds.shift();
+                                return new Promise((resolve) => {
+                                    function fillOut() {
+                                        terminal?.fillingIn();
+                                        ships[id].fillingOut();
+                                        queueBringIds.shift();
+                                        resolve(id);
+                                    }
+                                    ships[id].timer = window.setTimeout(fillOut, TIME_IN_TERMINAL);
+                                });
                             } else {
-                                terminal.fillingOut();
-                                ships[id].fillingIn();
-                                queueTakeoutIds.shift();
+                                return new Promise((resolve) => {
+                                    function fillIn() {
+                                        terminal?.fillingOut();
+                                        ships[id].fillingIn();
+                                        queueTakeoutIds.shift();
+                                        resolve(id);
+                                    }
+                                    ships[id].timer = window.setTimeout(fillIn, TIME_IN_TERMINAL);
+                                });
                             }
-                            return id;
                         })
                         .then((id) => console.log(`${id} in terminal end`));
             }
