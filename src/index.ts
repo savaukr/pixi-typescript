@@ -33,24 +33,23 @@ function gameLoop() {
             if (ships[id].status === SHIP_STATUS.PORT) {
                 const terminal = checkTerminals(terminals, id, queueTakeoutIds, queueBringIds);
                 if (terminal)
-                    ships[id].moveToTerminal(terminal).then((id) => {
-                        if (ships[id].type === SHIPS_TYPE.BRING) {
-                            terminal.fillingIn();
-                            ships[id].fillingOut();
-                            queueBringIds.shift();
-                        } else {
-                            terminal.fillingOut();
-                            ships[id].fillingIn();
-                            queueTakeoutIds.shift();
-                        }
-                    });
+                    ships[id]
+                        .moveToTerminal(terminal)
+                        .then((id) => {
+                            if (ships[id].type === SHIPS_TYPE.BRING) {
+                                terminal.fillingIn();
+                                ships[id].fillingOut();
+                                queueBringIds.shift();
+                            } else {
+                                terminal.fillingOut();
+                                ships[id].fillingIn();
+                                queueTakeoutIds.shift();
+                            }
+                            return id;
+                        })
+                        .then((id) => console.log(`${id} in terminal end`));
             }
         });
-        console.log("shipArr=", shipArr);
-        console.log("ships:", ships);
-        console.log("terminals", terminals);
-        console.log("queueBring:", queueBringIds);
-        console.log("queueTakeout:", queueTakeoutIds);
     }
 }
 
@@ -58,9 +57,11 @@ app.ticker.add(() => {
     gameLoop();
 });
 
+setTimeout(() => {
+    console.log("ships:", ships);
+    console.log("terminals", terminals);
+}, 15000);
 // console.log(checkTerminals);
-// console.log("terminals:", terminals);
-// console.log("ships:", ships);
 
 // if (ships[0]) ships[0].fillingIn();
 // app.view.removeChild(app.view.children[2]);

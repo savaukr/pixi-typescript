@@ -126,7 +126,7 @@ export class Ship implements IShip {
                 }
                 if (!this.speedX && !this.speedY) {
                     resolve();
-                    console.log(`${this.id} ship is stoped in moveTo`);
+                    // console.log(`${this.id} ship is stoped in moveTo`);
                 }
             } catch {
                 reject();
@@ -158,7 +158,7 @@ export class Ship implements IShip {
             if (this.id !== Number(id)) {
                 if (this.shipIntersect(ships[id])) {
                     if (this.id > ships[id].id && this.speedX && this.speedY) {
-                        console.log(`${this.id} ship is stoped inshipsIntersect()`);
+                        // console.log(`${this.id} ship is stoped inshipsIntersect()`);
                         this.stop();
                     }
                     return true;
@@ -172,7 +172,7 @@ export class Ship implements IShip {
         if (this.status === SHIP_STATUS.START) this.status = SHIP_STATUS.PORT;
         this._stopX = this.graph.x;
         this._stopY = this.graph.y;
-        console.log(`${this.id} ship is stoped in stop()`);
+        // console.log(`${this.id} ship is stoped in stop()`);
 
         this.speedX = 0;
         this.speedY = 0;

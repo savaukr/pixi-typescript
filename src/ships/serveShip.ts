@@ -37,7 +37,7 @@ export function initShips(app: Application, queueBringIds: string[], queueTakeou
     const timerId = setInterval(createShip, 3000);
 
     function createShip(): void {
-        if (id < 4) {
+        if (id < 14) {
             const ship = initShip(app, id, ships, queueBringIds, queueTakeoutIds);
             ships[id] = ship;
             app.stage.addChild(ship.graph);

@@ -11,7 +11,7 @@ export class ShipBring extends Ship {
         this.graph.lineStyle(10, SHIPS_COLORS.RED, 1);
         this.graph.drawRect(0, 0, SHIPS_LENGTH, SHIPS_WIDTH);
         this.graph.x = appWidth - SHIPS_LENGTH / 10;
-        this.graph.y = appHeight / 2 - 3.2 * SHIPS_WIDTH;
+        this.graph.y = appHeight / 2 - 6 * SHIPS_WIDTH;
         this.graph.endFill();
     }
     fillingIn() {

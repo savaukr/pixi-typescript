@@ -12,7 +12,7 @@ export class ShipTakeOut extends Ship {
         this.graph.lineStyle(10, SHIPS_COLORS.GREEN, 1);
         this.graph.drawRect(0, 0, SHIPS_LENGTH, SHIPS_WIDTH);
         this.graph.x = appWidth - SHIPS_LENGTH / 10;
-        this.graph.y = appHeight / 2 + 0.5 * SHIPS_WIDTH;
+        this.graph.y = appHeight / 2 + 1.7 * SHIPS_WIDTH;
         this.graph.endFill();
     }
     fillingIn() {
