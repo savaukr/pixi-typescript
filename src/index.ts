@@ -46,11 +46,11 @@ function gameLoop() {
                     });
             }
         });
-        // console.log("shipArr=", shipArr);
-        // console.log("ships:", ships);
-        // console.log("terminals", terminals);
-        // console.log("queueBring:", queueBringIds);
-        // console.log("queueTakeout:", queueTakeoutIds);
+        console.log("shipArr=", shipArr);
+        console.log("ships:", ships);
+        console.log("terminals", terminals);
+        console.log("queueBring:", queueBringIds);
+        console.log("queueTakeout:", queueTakeoutIds);
     }
 }
 
