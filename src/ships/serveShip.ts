@@ -34,7 +34,7 @@ export function initShips(app: Application, queueBringIds: string[], queueTakeou
     const ship = initShip(app, id, ships, queueBringIds, queueTakeoutIds);
     ships[id] = ship;
     id++;
-    const timerId = setInterval(createShip, 8000);
+    const timerId = setInterval(createShip, 3000);
 
     function createShip(): void {
         if (id < 4) {

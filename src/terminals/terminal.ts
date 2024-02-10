@@ -15,6 +15,8 @@ export interface ITerminal {
     fillingOut(): void;
 }
 
+export type TIs_Terminal = ITerminal | null;
+
 export class Terminal implements ITerminal {
     id: number;
     full: boolean;

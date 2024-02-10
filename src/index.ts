@@ -1,10 +1,10 @@
-// import { IShip } from "./ships/ship";
 import { Application } from "pixi.js";
-import { initTerminals } from "./terminals/serveTerminal";
+import { checkTerminals, initTerminals } from "./terminals/serveTerminal";
 
 import { initShips } from "./ships/serveShip";
 import "./style.css";
-import { ITerminal, TERMINAL_LENGTH } from "./terminals/terminal";
+import { ITerminal } from "./terminals/terminal";
+import { SHIP_STATUS } from "./ships/ship";
 
 const app = new Application<HTMLCanvasElement>({
     background: "#4d35FF",
@@ -26,58 +26,30 @@ function gameLoop() {
 
     if (shipArr.length) {
         shipArr.forEach((id: string) => {
-            if (!ships[id].shipsIntersect(ships)) {
+            if (!ships[id].shipsIntersect(ships) && ships[id].status === SHIP_STATUS.START) {
                 ships[id].moveToPort();
             }
+
+            if (ships[id].status === SHIP_STATUS.PORT) {
+                const terminal = checkTerminals(terminals, id, queueTakeoutIds, queueBringIds);
+                if (terminal) ships[id].moveToTerminal(terminal).then(() => console.log("ship in terminal"));
+            }
         });
-        console.log("shipArr=", shipArr);
-        console.log("ships:", ships);
-        console.log("terminals", terminals);
-        console.log("queueBring:", queueBringIds);
-        console.log("queueTakeout:", queueTakeoutIds);
+        // console.log("shipArr=", shipArr);
+        // console.log("ships:", ships);
+        // console.log("terminals", terminals);
+        // console.log("queueBring:", queueBringIds);
+        // console.log("queueTakeout:", queueTakeoutIds);
     }
-    // checkTerminals(terminals);
 }
 
 app.ticker.add(() => {
     gameLoop();
 });
 
-function checkTerminals(terminals: ITerminal[]): void {
-    terminals.forEach((terminal) => {
-        if (terminal.full) {
-            const pickingId = queueTakeoutIds.shift();
-            if (pickingId) {
-                ships[pickingId].moveTo(terminal.topRight[0], terminal.topRight[1] + TERMINAL_LENGTH / 2).then(() => {
-                    setTimeout(() => {
-                        if (pickingId) {
-                            terminal.fillingOut();
-                            ships[pickingId].fillingIn;
-                            ships[pickingId].moveTo(innerWidth, innerHeight / 2);
-                        }
-                    }, 5000);
-                });
-            }
-        } else {
-            const bringingId = queueBringIds.shift();
-            if (bringingId) {
-                ships[bringingId].moveTo(terminal.topRight[0], terminal.topRight[1] + TERMINAL_LENGTH / 2).then(() => {
-                    setTimeout(() => {
-                        if (bringingId) {
-                            terminal.fillingIn();
-                            ships[bringingId].fillingOut;
-                            ships[bringingId].moveTo(innerWidth, innerHeight / 2);
-                        }
-                    }, 5000);
-                });
-            }
-        }
-    });
-}
-
-// checkTerminals(terminals);
 console.log(checkTerminals);
 console.log("terminals:", terminals);
+console.log("ships:", ships);
 
 // if (ships[0]) ships[0].fillingIn();
 // app.view.removeChild(app.view.children[2]);

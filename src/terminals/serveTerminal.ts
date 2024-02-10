@@ -1,7 +1,7 @@
 import { COUNT_TERMINAL } from "./../consts";
 import { Application, Graphics } from "pixi.js";
 import { BOARD_BOTTOM, BOARD_PASSAGE, BOARD_TOP, PORT_WIDTH } from "../consts";
-import { ITerminal, TERMINAL_COLOR, TERMINAL_LENGTH, TERMINAL_WIDTH, Terminal } from "./terminal";
+import { ITerminal, TERMINAL_COLOR, TERMINAL_LENGTH, TERMINAL_WIDTH, TIs_Terminal, Terminal } from "./terminal";
 import { appHeight, appWidth } from "..";
 
 export function initTerminals(app: Application): ITerminal[] {
@@ -28,6 +28,34 @@ export function initTerminals(app: Application): ITerminal[] {
     }
     app.stage.addChild(portArea);
     return terminals;
+}
+
+export function checkTerminals(
+    terminals: ITerminal[],
+    shipId: string,
+    queueTakeoutIds: string[],
+    queueBringIds: string[],
+): TIs_Terminal {
+    let founded = null;
+    console.log(queueTakeoutIds);
+    console.log(queueBringIds);
+    let i = 0;
+    while (i < terminals.length && !founded) {
+        if (!terminals[i].full && queueBringIds.length) {
+            if (queueBringIds[0] === shipId) {
+                // queueBringIds.shift();
+                founded = terminals[i];
+            }
+        }
+        if (terminals[i].full && queueTakeoutIds.length) {
+            if (queueTakeoutIds[0] === shipId) {
+                // queueTakeoutIds.shift();
+                founded = terminals[i];
+            }
+        }
+        i++;
+    }
+    return founded;
 }
 
 // export function updViewTerminal(portArea: Graphics, i: number, terminals: ITerminal[]): void {

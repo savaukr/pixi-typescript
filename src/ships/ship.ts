@@ -1,7 +1,8 @@
 import { Graphics } from "pixi.js";
 
-import { PORT_WIDTH, SD, SHIP_SPEED } from "../consts";
+import { PORT_WIDTH, SD, SHIPS_WIDTH, SHIP_SPEED } from "../consts";
 import { appWidth } from "..";
+import { ITerminal, TERMINAL_LENGTH } from "../terminals/terminal";
 
 export enum SHIPS_COLORS {
     GREEN = 0x046a26,
@@ -29,14 +30,16 @@ export interface IShip {
     graph: Graphics;
     type?: string;
     status: SHIP_STATUS;
+    speedX: number;
+    speedY: number;
     fillingIn(): void;
     fillingOut(): void;
     shipIntersect(shipOther: IShip): boolean;
     shipsIntersect(ships: TShips): boolean;
-    moveToPort(): Promise<void>;
-    stop(): void;
-    rotate(rad: number): void;
     moveTo(x: number, y: number): Promise<void>;
+    moveToPort(): Promise<void>;
+    moveToTerminal(terminal: ITerminal): Promise<void>;
+    stop(): void;
 }
 
 export class Ship implements IShip {
@@ -47,8 +50,8 @@ export class Ship implements IShip {
     status: SHIP_STATUS;
     private _stopX: number;
     private _stopY: number;
-    private _speedX: number;
-    private _speedY: number;
+    speedX: number;
+    speedY: number;
 
     constructor(id: number, ships: TShips, full: boolean) {
         this.id = id;
@@ -56,8 +59,8 @@ export class Ship implements IShip {
         this.full = full;
         this.graph = new Graphics();
         this.status = SHIP_STATUS.START;
-        this._speedX = SHIP_SPEED;
-        this._speedY = SHIP_SPEED;
+        this.speedX = SHIP_SPEED;
+        this.speedY = SHIP_SPEED;
         this._stopX = 0;
         this._stopY = 0;
     }
@@ -78,9 +81,9 @@ export class Ship implements IShip {
     }
     protected changeY(direction: boolean | number, speed: number) {
         if (Boolean(direction)) this.graph.y += speed;
-        this.graph.y += speed;
+        this.graph.y -= speed;
     }
-    rotate(rad: number) {
+    protected rotate(rad: number) {
         this.graph.rotation += rad;
     }
 
@@ -88,8 +91,8 @@ export class Ship implements IShip {
         return new Promise((resolve, reject) => {
             try {
                 if (this.graph.x > PORT_WIDTH * appWidth) {
-                    this.changeX(0, this._speedX);
-                } else {
+                    this.changeX(0, this.speedX);
+                } else if (this.status === SHIP_STATUS.START) {
                     this.status = SHIP_STATUS.PORT;
                     this.stop();
                     resolve();
@@ -102,33 +105,39 @@ export class Ship implements IShip {
     async moveTo(x: number, y: number): Promise<void> {
         return new Promise((resolve, reject) => {
             try {
-                if (this._speedX !== 0 || this._speedY !== 0) {
-                    this.changeX(this.graph.x < x, this._speedX);
-                    this.changeY(this.graph.y < y, this._speedY);
+                if (this.speedX !== 0 || this.speedY !== 0) {
+                    this.changeX(this.graph.x < x, this.speedX);
+                    this.changeY(this.graph.y < y, this.speedY);
                 } else {
                     const distanceX: number = this._stopX - x;
                     const distanceY: number = this._stopY - y;
                     const distanceTotal: number = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-                    this._speedX = (distanceX / distanceTotal) * SHIP_SPEED;
-                    this._speedY = (distanceY / distanceTotal) * SHIP_SPEED;
-
-                    this.changeX(distanceX > 0, this._speedX);
-                    this.changeY(distanceY > 0, this._speedY);
+                    this.speedX = Math.abs((distanceX / distanceTotal) * SHIP_SPEED);
+                    this.speedY = Math.abs((distanceY / distanceTotal) * SHIP_SPEED);
+                    this.changeX(distanceX < 0, this.speedX);
+                    this.changeY(distanceY < 0, this.speedY);
                 }
 
-                if (this.graph.x - x < this._speedX) {
+                if (this.graph.x - x < this.speedX) {
                     this.graph.x = x;
-                    this._speedX = 0;
+                    this.speedX = 0;
                 }
-                if (this.graph.y - y < this._speedY) {
+                if (this.graph.y - y < this.speedY) {
                     this.graph.y = y;
-                    this._speedY = 0;
+                    this.speedY = 0;
                 }
-                if (!this._speedX && !this._speedY) resolve();
+                if (!this.speedX && !this.speedY) {
+                    resolve();
+                    console.log("ship is stoped in moveTo");
+                }
             } catch {
                 reject();
             }
         });
+    }
+
+    async moveToTerminal(terminal: ITerminal): Promise<void> {
+        return this.moveTo(terminal.bottomRight[0], terminal.bottomRight[1] - TERMINAL_LENGTH / 2 - SHIPS_WIDTH / 2);
     }
 
     shipIntersect(shipOther: IShip) {
@@ -145,7 +154,10 @@ export class Ship implements IShip {
         shipArr.forEach((id: string) => {
             if (this.id !== Number(id)) {
                 if (this.shipIntersect(ships[id])) {
-                    if (this.id > ships[id].id) this.stop();
+                    if (this.id > ships[id].id && this.speedX && this.speedY) {
+                        console.log(`${this.id} ship is stoped inshipsIntersect()`);
+                        this.stop();
+                    }
                     return true;
                 }
             }
@@ -157,7 +169,8 @@ export class Ship implements IShip {
         if (this.status === SHIP_STATUS.START) this.status = SHIP_STATUS.PORT;
         this._stopX = this.graph.x;
         this._stopY = this.graph.y;
-        this._speedX = 0;
-        this._speedY = 0;
+        // console.log("ship is stoped in stop()");
+        this.speedX = 0;
+        this.speedY = 0;
     }
 }
