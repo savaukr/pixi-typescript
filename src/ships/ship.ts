@@ -183,6 +183,7 @@ export class Ship implements IShip {
 
     remove() {
         // app.stage.removeChild(this.graph);
+        if (this.timer) window.clearTimeout(this.timer);
         this.graph.destroy();
     }
 }
