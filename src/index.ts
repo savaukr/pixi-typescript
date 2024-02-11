@@ -8,7 +8,7 @@ import { SHIPS_TYPE, SHIP_STATUS } from "./ships/ship";
 
 import { TIME_IN_TERMINAL } from "./consts";
 
-const app = new Application<HTMLCanvasElement>({
+export const app = new Application<HTMLCanvasElement>({
     background: "#4d35FF",
     resizeTo: window,
 });
@@ -25,14 +25,13 @@ const ships = initShips(app, queueBringIds, queueTakeoutIds);
 
 function gameLoop() {
     const shipArr = Object.keys(ships);
-
     if (shipArr.length) {
         shipArr.forEach((id: string) => {
-            if (!ships[id].shipsIntersect(ships) && ships[id].status === SHIP_STATUS.START) {
+            if (ships[id] && !ships[id].shipsIntersect(ships) && ships[id].status === SHIP_STATUS.START) {
                 ships[id].moveToPort();
             }
 
-            if (ships[id].status === SHIP_STATUS.PORT) {
+            if (ships[id] && ships[id].status === SHIP_STATUS.PORT) {
                 const terminal = checkTerminals(terminals, id, queueTakeoutIds, queueBringIds);
                 if (terminal) {
                     ships[id].moveToTerminal(terminal).then((id) => {
@@ -47,13 +46,15 @@ function gameLoop() {
                                     terminal?.fillingIn();
                                     ships[id].fillingOut();
                                     queueBringIds.shift();
-                                    ships[id].status = SHIP_STATUS.OUT;
+                                    ships[id].status = SHIP_STATUS.BEFORE_OUT;
+                                    // ships[id].rotate(5 * Math.PI);
+                                    // ships[id].graph.rotation = -90;
                                     resolve(id);
                                 }
                                 ships[id].timer = window.setTimeout(fillOut, TIME_IN_TERMINAL);
                             });
                         } else {
-                            //if nee a few ship of one type  one time  in port
+                            //if need a few ship of one type  one time  in port
                             // queueTakeoutIds.shift();
                             // terminal.full = false;
                             return new Promise((resolve) => {
@@ -61,7 +62,10 @@ function gameLoop() {
                                     terminal?.fillingOut();
                                     ships[id].fillingIn();
                                     queueTakeoutIds.shift();
-                                    ships[id].status = SHIP_STATUS.OUT;
+                                    ships[id].status = SHIP_STATUS.BEFORE_OUT;
+                                    // ships[id].rotate(5 * Math.PI);
+                                    // ships[id].graph.rotation = 180;
+
                                     resolve(id);
                                 }
                                 ships[id].timer = window.setTimeout(fillIn, TIME_IN_TERMINAL);
@@ -70,109 +74,26 @@ function gameLoop() {
                     });
                 }
             }
-            if (ships[id].status === SHIP_STATUS.OUT) {
-                console.log("OUT");
-                ships[id].moveToOut();
+            if (ships?.[id] && ships[id].status === SHIP_STATUS.BEFORE_OUT) {
+                ships[id].moveToMiddle().then(() => {
+                    ships[id].rotate(5 * Math.PI);
+                    ships[id].status = SHIP_STATUS.OUT;
+                });
+            }
+            if (ships?.[id] && ships?.[id].status === SHIP_STATUS.OUT) {
+                ships[id].moveToOut().then(() => {
+                    ships[id].remove();
+                    delete ships[id];
+                });
             }
         });
     }
 }
 
 app.ticker.add(() => {
-    gameLoop();
+    try {
+        gameLoop();
+    } catch (err) {
+        console.log("ERROR", err);
+    }
 });
-
-// setTimeout(() => {
-//     console.log("ships:", ships);
-//     console.log("terminals", terminals);
-// }, 15000);
-// console.log(checkTerminals);
-
-// if (ships[0]) ships[0].fillingIn();
-// app.view.removeChild(app.view.children[2]);
-
-// Add it to the stage to render
-// console.log(
-//     `%cPixiJS V7\nTypescript Boilerplate%c ${VERSION} %chttp://www.pixijs.com %c❤️`,
-//     "background: #ff66a1; color: #FFFFFF; padding: 2px 4px; border-radius: 2px; font-weight: bold;",
-//     "color: #D81B60; font-weight: bold;",
-//     "color: #C2185B; font-weight: bold; text-decoration: underline;",
-//     "color: #ff66a1;",
-// );
-
-// import { Application, Assets } from "pixi.js";
-// import { getSpine } from "./utils/spine-example";
-// import { createBird } from "./utils/create-bird";
-// import { attachConsole } from "./utils/attach-console";
-
-// const gameWidth = 1280;
-// const gameHeight = 720;
-
-// const app = new Application<HTMLCanvasElement>({
-//     backgroundColor: 0xd3d3d3,
-//     width: gameWidth,
-//     height: gameHeight,
-// });
-
-// window.onload = async (): Promise<void> => {
-//     await loadGameAssets();
-
-//     document.body.appendChild(app.view);
-
-//     resizeCanvas();
-
-//     const birdFromSprite = createBird();
-//     birdFromSprite.anchor.set(0.5, 0.5);
-//     birdFromSprite.position.set(gameWidth / 2, gameHeight / 4);
-
-//     const spineExample = await getSpine();
-
-//     app.stage.addChild(birdFromSprite);
-//     app.stage.addChild(spineExample);
-//     app.stage.interactive = true;
-
-//     if (VERSION.includes("d")) {
-//         // if development version
-//         attachConsole(app.stage, gameWidth, gameHeight);
-//     }
-// };
-
-// async function loadGameAssets(): Promise<void> {
-//     const manifest = {
-//         bundles: [
-//             {
-//                 name: "bird",
-//                 assets: [
-//                     {
-//                         name: "bird",
-//                         srcs: "./assets/simpleSpriteSheet.json",
-//                     },
-//                 ],
-//             },
-//             {
-//                 name: "pixie",
-//                 assets: [
-//                     {
-//                         name: "pixie",
-//                         srcs: "./assets/spine-assets/pixie.json",
-//                     },
-//                 ],
-//             },
-//         ],
-//     };
-
-//     await Assets.init({ manifest });
-//     await Assets.loadBundle(["bird", "pixie"]);
-// }
-
-// function resizeCanvas(): void {
-//     const resize = () => {
-//         app.renderer.resize(window.innerWidth, window.innerHeight);
-//         app.stage.scale.x = window.innerWidth / gameWidth;
-//         app.stage.scale.y = window.innerHeight / gameHeight;
-//     };
-
-//     resize();
-
-//     window.addEventListener("resize", resize);
-// }

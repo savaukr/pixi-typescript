@@ -2,6 +2,7 @@ import { ShipBring } from "./shipBring";
 import { ShipTakeOut } from "./shipTakeOut";
 import { IShip, Ship, TShips } from "./ship";
 import { Application } from "pixi.js";
+import { MAX_SHIP_COUNT, SHIP_CREATE_TIME } from "../consts";
 
 export function initShip(
     app: Application,
@@ -11,9 +12,8 @@ export function initShip(
     queueTakeoutIds: string[],
 ): IShip {
     let ship: Ship;
-    // const rand = Math.floor(1 + Math.random() * (2 + 1 - 1));
-    // if (rand < 2) {
-    if (false) {
+    const rand = Math.floor(Math.random() * 1000);
+    if (rand < 500) {
         ship = new ShipTakeOut(id, ships);
         ships[id] = ship;
         queueTakeoutIds.push(id.toString());
@@ -35,10 +35,10 @@ export function initShips(app: Application, queueBringIds: string[], queueTakeou
     const ship = initShip(app, id, ships, queueBringIds, queueTakeoutIds);
     ships[id] = ship;
     id++;
-    const timerId = setInterval(createShip, 3000);
+    const timerId = setInterval(createShip, SHIP_CREATE_TIME);
 
     function createShip(): void {
-        if (id < 1) {
+        if (id < MAX_SHIP_COUNT) {
             const ship = initShip(app, id, ships, queueBringIds, queueTakeoutIds);
             ships[id] = ship;
             app.stage.addChild(ship.graph);
