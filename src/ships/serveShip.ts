@@ -13,7 +13,7 @@ export function initShip(
 ): IShip {
     let ship: Ship;
     const rand = Math.floor(Math.random() * 1000);
-    if (rand < 500) {
+    if (rand <= 500) {
         ship = new ShipTakeOut(id, ships);
         ships[id] = ship;
         queueTakeoutIds.push(id.toString());

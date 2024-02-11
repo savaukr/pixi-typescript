@@ -8,8 +8,8 @@ export const SHIPS_LENGTH = 80;
 export const MAX_SHIP_COUNT = 50;
 
 export const SHIP_CREATE_TIME = 8000;
-export const SHIP_SPEED = 5;
-export const SD = 15; //safe distance between ships
+export const SHIP_SPEED = 15;
+export const SD = 20; //safe distance between ships
 
 export const COUNT_TERMINAL = 4;
 export const TIME_IN_TERMINAL = 5000;

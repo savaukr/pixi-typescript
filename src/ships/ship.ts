@@ -90,7 +90,7 @@ export class Ship implements IShip {
         else this.graph.y -= speed;
     }
     rotate(rad: number) {
-        this.graph.rotation += 0.8 * rad;
+        this.graph.rotation += 0.5 * rad;
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         // const saveThis = this;
         // this.graph.pivot.x = 0; // Half of the width
